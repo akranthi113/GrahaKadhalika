@@ -217,35 +217,6 @@ export default function KundliGenerator() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="birth_latitude">Latitude</label>
-                <input
-                  type="number"
-                  step="any"
-                  id="birth_latitude"
-                  name="birth_latitude"
-                  placeholder="e.g. 28.6139"
-                  value={formData.birth_latitude}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="birth_longitude">Longitude</label>
-                <input
-                  type="number"
-                  step="any"
-                  id="birth_longitude"
-                  name="birth_longitude"
-                  placeholder="e.g. 77.2090"
-                  value={formData.birth_longitude}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="kundli-form-col">
-              <div className="form-group">
                 <label htmlFor="birth_place">Birth Place</label>
                 <div className="place-input-row">
                   <div className="place-input-wrap">
@@ -303,7 +274,35 @@ export default function KundliGenerator() {
                 </div>
                 {geocodeError && <p className="geocode-error">{geocodeError}</p>}
               </div>
+              <div className="form-group">
+                <label htmlFor="birth_latitude">Latitude</label>
+                <input
+                  type="number"
+                  step="any"
+                  id="birth_latitude"
+                  name="birth_latitude"
+                  placeholder="e.g. 28.6139"
+                  value={formData.birth_latitude}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="birth_longitude">Longitude</label>
+                <input
+                  type="number"
+                  step="any"
+                  id="birth_longitude"
+                  name="birth_longitude"
+                  placeholder="e.g. 77.2090"
+                  value={formData.birth_longitude}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
 
+            <div className="kundli-form-col">
               <div className="form-group">
                 <label htmlFor="timezone">Timezone</label>
                 <select

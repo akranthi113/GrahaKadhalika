@@ -22,8 +22,28 @@
 }
 
 .table-scroll {
+  position: relative;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  scrollbar-color: var(--color-primary) transparent;
+}
+
+.table-scroll::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 36px;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.18));
+  border-radius: 0 var(--radius) var(--radius) 0;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.table-scroll.has-scroll:not(.scrolled-end)::after {
+  opacity: 1;
 }
 
 .table-container h3 {

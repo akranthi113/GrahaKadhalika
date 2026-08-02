@@ -1,6 +1,13 @@
+import { useRef } from 'react'
+import { useScrollableFade } from '../hooks/useScrollableFade'
 import './VedicChartDisplay.css'
 
 export default function VedicChartDisplay({ chartData, houses }) {
+  const planetRef = useRef(null)
+  const houseRef = useRef(null)
+  useScrollableFade(planetRef, [chartData])
+  useScrollableFade(houseRef, [chartData, houses])
+
   if (!chartData) return null
 
   const { bodies = [] } = chartData
@@ -98,9 +105,9 @@ export default function VedicChartDisplay({ chartData, houses }) {
       <h2>Vedic Chart Analysis</h2>
 
       <div className="chart-tables">
-        <div className="table-container">
-          <h3>Planet Analysis</h3>
-          <div className="table-scroll">
+<div className="table-container">
+            <h3>Planet Analysis</h3>
+            <div className="table-scroll" ref={planetRef}>
           <table className="vedic-table">
             <thead>
               <tr>
@@ -141,7 +148,7 @@ export default function VedicChartDisplay({ chartData, houses }) {
         {houses && (
           <div className="table-container">
             <h3>House Analysis</h3>
-            <div className="table-scroll">
+            <div className="table-scroll" ref={houseRef}>
             <table className="vedic-table">
               <thead>
                 <tr>

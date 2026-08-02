@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { DateTime } from 'luxon'
+import { useScrollableFade } from '../hooks/useScrollableFade'
 import './VimsottariDasaTable.css'
 
 const DASA_SEQUENCE = [
@@ -98,6 +99,10 @@ function computeDasaPeriods(chartData) {
 
 export default function VimsottariDasaTable({ chartData }) {
   const [selectedIndex, setSelectedIndex] = useState(-1)
+  const mainTableRef = useRef(null)
+  const subTableRef = useRef(null)
+  useScrollableFade(mainTableRef, [chartData, selectedIndex])
+  useScrollableFade(subTableRef, [chartData, selectedIndex])
 
   const dasa = computeDasaPeriods(chartData)
   if (!dasa) return null
@@ -112,7 +117,7 @@ export default function VimsottariDasaTable({ chartData }) {
       <p className="dasa-meta">
         Janma Nakshatra: <strong>{dasa.nakName}</strong> (lord {dasa.nakLord})
       </p>
-      <div className="table-scroll">
+      <div className="table-scroll" ref={mainTableRef}>
         <table className="vedic-table dasa-table-inner">
           <thead>
             <tr>
@@ -163,7 +168,7 @@ export default function VimsottariDasaTable({ chartData }) {
           <h4>
             Antardasa of {selected.abbr} ({selected.id}) · {selected.start} — {selected.end}
           </h4>
-          <div className="table-scroll">
+          <div className="table-scroll" ref={subTableRef}>
             <table className="vedic-table dasa-sub-table">
               <thead>
                 <tr>
