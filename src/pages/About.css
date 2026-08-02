@@ -1,0 +1,101 @@
+.about {
+  flex: 1;
+}
+
+.about-hero {
+  text-align: center;
+  padding: 4rem 1.5rem 2rem;
+}
+
+.about-hero h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: 1rem;
+  color: var(--color-primary);
+}
+
+.about-tagline {
+  color: var(--color-text-muted);
+  font-style: italic;
+  font-size: 1.1rem;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+.about-body {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 4rem;
+}
+
+.about-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.about-section h2 {
+  color: var(--color-primary);
+  font-size: 1.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.about-section p {
+  color: var(--color-text);
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.about-section p:last-child {
+  margin-bottom: 0;
+}
+
+.about-mission {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.about-mission li {
+  position: relative;
+  padding: 0.5rem 0 0.5rem 1.75rem;
+  color: var(--color-text);
+  line-height: 1.7;
+}
+
+.about-mission li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.95rem;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+}
+
+.about-quote {
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--color-primary);
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.75rem 2rem;
+  margin: 2rem 0 0;
+}
+
+@media (max-width: 640px) {
+  .about-hero {
+    padding: 3rem 1rem 1.5rem;
+  }
+
+  .about-section {
+    padding: 1.5rem;
+  }
+}

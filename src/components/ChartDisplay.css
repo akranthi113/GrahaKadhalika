@@ -1,0 +1,161 @@
+.chart-display {
+  max-width: 620px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.chart-display h2 {
+  text-align: center;
+  margin-bottom: 0.75rem;
+  color: var(--color-primary);
+}
+
+.chart-container {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius) * 1.5);
+  box-shadow:
+    0 0 0 3px rgba(99, 102, 241, 0.06),
+    0 0 24px rgba(99, 102, 241, 0.1);
+}
+
+.south-indian-chart {
+  width: 100%;
+  max-width: 520px;
+}
+
+.si-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 4px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius);
+  padding: 4px;
+  aspect-ratio: 1 / 1;
+}
+
+.si-house {
+  position: relative;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface-hover);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.si-house.si-lagna {
+  border: 2px solid var(--color-primary);
+  background: rgba(99, 102, 241, 0.12);
+}
+
+.si-house-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+.si-house-num {
+  font-weight: 700;
+  color: var(--color-primary);
+  background: rgba(99, 102, 241, 0.15);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.65rem;
+}
+
+.si-sign-label {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.si-sign-symbol {
+  color: var(--color-secondary);
+}
+
+.si-lagna-mark {
+  position: absolute;
+  left: 6px;
+  top: 24px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  letter-spacing: 0.5px;
+}
+
+.si-planets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px 8px;
+  margin-top: auto;
+  padding-top: 2px;
+}
+
+.si-planet {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  font-size: 0.75rem;
+}
+
+.si-planet-symbol {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.si-planet-degree {
+  font-size: 0.6rem;
+  color: var(--color-text-muted);
+}
+
+.si-planet-retro {
+  font-size: 0.55rem;
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.si-center {
+  grid-row: 2 / 4;
+  grid-column: 2 / 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--color-text-muted);
+}
+
+.si-center-title {
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.si-center-sign {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+@media (max-width: 640px) {
+  .chart-container {
+    padding: 0.75rem;
+  }
+}
