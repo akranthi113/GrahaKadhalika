@@ -105,58 +105,8 @@
     padding: 1rem;
   }
 
-  .vedic-table,
-  .vedic-table tbody,
-  .vedic-table tr,
-  .vedic-table td {
-    display: block;
-    width: 100%;
-  }
-
-  .vedic-table {
-    min-width: 0;
-    font-size: 0.875rem;
-  }
-
-  .vedic-table thead {
-    display: none;
-  }
-
-  .vedic-table tbody tr {
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    margin-bottom: 1rem;
-    padding: 0.25rem 0;
-    box-shadow: var(--shadow);
-  }
-
-  .vedic-table td {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 1rem;
-    padding: 0.6rem 1rem;
-    border-bottom: 1px solid var(--color-border);
-    white-space: normal;
-    text-align: right;
-  }
-
-  .vedic-table td:last-child {
-    border-bottom: none;
-  }
-
-  .vedic-table td::before {
-    content: attr(data-label);
-    flex-shrink: 0;
-    font-weight: 600;
-    color: var(--color-primary);
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .vedic-table td:first-child {
-    font-weight: 700;
-    color: var(--color-primary);
+  .table-scroll {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
   }
 }
