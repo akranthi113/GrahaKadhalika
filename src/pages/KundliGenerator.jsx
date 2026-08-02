@@ -50,6 +50,7 @@ export default function KundliGenerator() {
   const [chartData, setChartData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
   const debounceTimer = useRef(null)
   const resultsRef = useRef(null)
 
@@ -62,7 +63,8 @@ export default function KundliGenerator() {
   }, [chartData])
 
   function handleChange(e) {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   function searchPlaceSuggestions(query) {
@@ -94,13 +96,13 @@ export default function KundliGenerator() {
   }
 
   function selectPlace(place) {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       birth_place: place.name,
       birth_latitude: place.latitude.toString(),
       birth_longitude: place.longitude.toString(),
       timezone: timezoneForLongitude(place.longitude),
-    })
+    }))
     setSuggestions([])
     setShowSuggestions(false)
     setActiveIndex(-1)
@@ -146,14 +148,14 @@ export default function KundliGenerator() {
 
     try {
       const { latitude, longitude } = await geocodePlace(formData.birth_place)
-      setFormData({
-        ...formData,
+      setFormData((prev) => ({
+        ...prev,
         birth_latitude: latitude.toString(),
         birth_longitude: longitude.toString(),
         timezone: timezoneForLongitude(longitude),
-      })
+      }))
     } catch (geocodeErr) {
-      setGeocodeError(geocodeErr.message)
+      setGeocodeError(geocodeErr.message || 'Location not found')
     } finally {
       setGeocoding(false)
     }
@@ -173,7 +175,7 @@ export default function KundliGenerator() {
       )
       setChartData(chart)
     } catch (calcErr) {
-      setError(calcErr.message)
+      setError(calcErr.message || 'Error generating chart')
     } finally {
       setLoading(false)
     }
@@ -192,7 +194,8 @@ export default function KundliGenerator() {
         </header>
 
         <form onSubmit={handleChartSubmit} className="kundli-form">
-          <div className="kundli-form-columns">
+          <div className="kundli-form-grid">
+            {/* Left Column: Date and Time */}
             <div className="kundli-form-col">
               <div className="form-group">
                 <label htmlFor="birth_date">Birth Date</label>
@@ -205,6 +208,7 @@ export default function KundliGenerator() {
                   required
                 />
               </div>
+
               <div className="form-group">
                 <label htmlFor="birth_time">Birth Time</label>
                 <input
@@ -216,9 +220,13 @@ export default function KundliGenerator() {
                   required
                 />
               </div>
+            </div>
+
+            {/* Right Column: Birth Place & Manual Coordinates */}
+            <div className="kundli-form-col">
               <div className="form-group">
                 <label htmlFor="birth_place">Birth Place</label>
-                <div className="place-input-row">
+                <div className="place-input-row" onBlur={handlePlaceBlur}>
                   <div className="place-input-wrap">
                     <input
                       type="text"
@@ -228,7 +236,6 @@ export default function KundliGenerator() {
                       value={formData.birth_place}
                       onChange={handlePlaceChange}
                       onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-                      onBlur={handlePlaceBlur}
                       onKeyDown={handleSuggestionKeyDown}
                       role="combobox"
                       aria-autocomplete="list"
@@ -238,6 +245,7 @@ export default function KundliGenerator() {
                         activeIndex >= 0 ? `place-suggestion-${activeIndex}` : undefined
                       }
                       autoComplete="off"
+                      required
                     />
                     {showSuggestions && suggestions.length > 0 && (
                       <ul className="place-suggestions" id="place-suggestions-listbox" role="listbox">
@@ -249,8 +257,10 @@ export default function KundliGenerator() {
                               role="option"
                               aria-selected={i === activeIndex}
                               className={`place-suggestion${i === activeIndex ? ' active' : ''}`}
-                              onMouseDown={() => selectPlace(suggestion)}
-                              onClick={() => selectPlace(suggestion)}
+                              onMouseDown={(e) => {
+                                e.preventDefault()
+                                selectPlace(suggestion)
+                              }}
                               onMouseEnter={() => setActiveIndex(i)}
                             >
                               <span className="place-suggestion-name">{suggestion.name}</span>
@@ -274,35 +284,39 @@ export default function KundliGenerator() {
                 </div>
                 {geocodeError && <p className="geocode-error">{geocodeError}</p>}
               </div>
-              <div className="form-group">
-                <label htmlFor="birth_latitude">Latitude</label>
-                <input
-                  type="number"
-                  step="any"
-                  id="birth_latitude"
-                  name="birth_latitude"
-                  placeholder="e.g. 28.6139"
-                  value={formData.birth_latitude}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="birth_longitude">Longitude</label>
-                <input
-                  type="number"
-                  step="any"
-                  id="birth_longitude"
-                  name="birth_longitude"
-                  placeholder="e.g. 77.2090"
-                  value={formData.birth_longitude}
-                  onChange={handleChange}
-                  required
-                />
+
+              <div className="form-row-2col">
+                <div className="form-group">
+                  <label htmlFor="birth_latitude">Latitude</label>
+                  <input
+                    type="number"
+                    step="any"
+                    id="birth_latitude"
+                    name="birth_latitude"
+                    placeholder="28.6139"
+                    value={formData.birth_latitude}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="birth_longitude">Longitude</label>
+                  <input
+                    type="number"
+                    step="any"
+                    id="birth_longitude"
+                    name="birth_longitude"
+                    placeholder="77.2090"
+                    value={formData.birth_longitude}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="kundli-form-col">
+            {/* Full-Width Row: Timezone */}
+            <div className="kundli-form-full">
               <div className="form-group">
                 <label htmlFor="timezone">Timezone</label>
                 <select
@@ -311,12 +325,12 @@ export default function KundliGenerator() {
                   value={formData.timezone}
                   onChange={handleChange}
                 >
-                  <option value="UTC">UTC</option>
-                  <option value="Asia/Kolkata">IST (India)</option>
-                  <option value="America/New_York">EST (New York)</option>
-                  <option value="America/Los_Angeles">PST (Los Angeles)</option>
-                  <option value="Europe/London">GMT (London)</option>
-                  <option value="Asia/Tokyo">JST (Tokyo)</option>
+                  <option value="UTC">UTC (Coordinated Universal Time)</option>
+                  <option value="Asia/Kolkata">IST - India Standard Time (+05:30)</option>
+                  <option value="America/New_York">EST - Eastern Time (-05:00)</option>
+                  <option value="America/Los_Angeles">PST - Pacific Time (-08:00)</option>
+                  <option value="Europe/London">GMT - Greenwich Mean Time (+00:00)</option>
+                  <option value="Asia/Tokyo">JST - Japan Standard Time (+09:00)</option>
                 </select>
               </div>
             </div>
@@ -326,7 +340,7 @@ export default function KundliGenerator() {
             {loading ? (
               <>
                 <span className="spinner" aria-hidden="true" />
-                Calculating...
+                Calculating Chart...
               </>
             ) : (
               'Calculate Chart'

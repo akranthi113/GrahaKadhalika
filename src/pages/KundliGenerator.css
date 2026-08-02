@@ -1,65 +1,81 @@
 .kundli {
   flex: 1;
-  padding: 2rem 0 4rem;
+  padding: 2.5rem 0 4rem;
 }
 
 .kundli-container {
-  max-width: 900px;
+  max-width: 920px;
   margin: 0 auto;
   padding: 0 1.5rem;
 }
 
+/* --- Breadcrumbs & Header --- */
 .kundli-breadcrumb {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .kundli-breadcrumb a {
-  color: var(--color-text-muted);
+  color: var(--color-text-muted, #64748b);
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .kundli-breadcrumb a:hover {
-  color: var(--color-primary);
+  color: var(--color-primary, #4f46e5);
 }
 
 .kundli-header {
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 .kundli-header h1 {
-  font-size: clamp(1.4rem, 3.5vw, 2rem);
-  margin-bottom: 0.25rem;
-  color: var(--color-primary);
+  font-size: clamp(1.6rem, 4vw, 2.25rem);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--color-primary, #4f46e5);
+  letter-spacing: -0.02em;
 }
 
 .kundli-header p {
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
+  color: var(--color-text-muted, #64748b);
+  font-size: 0.95rem;
 }
 
-/* --- Compact form --- */
+/* --- Form Layout --- */
 .kundli-form {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 1.5rem;
-  margin: 0 auto 1.5rem;
-  max-width: 720px;
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius, 12px);
+  padding: 2rem;
+  margin: 0 auto 2rem;
+  max-width: 760px;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.05));
 }
 
-.kundli-form-columns {
+.kundli-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 .kundli-form-col {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
   min-width: 0;
+}
+
+.kundli-form-full {
+  grid-column: 1 / -1;
+}
+
+.form-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
 }
 
 .kundli-form .form-group {
@@ -69,27 +85,81 @@
 }
 
 .kundli-form .form-group label {
-  font-size: 0.8rem;
+  font-size: 0.825rem;
   font-weight: 600;
-  color: var(--color-text-muted);
+  color: var(--color-text, #1e293b);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .kundli-form input,
 .kundli-form select {
-  padding: 0.6rem 0.9rem;
+  width: 100%;
+  padding: 0.65rem 0.9rem;
   min-height: 44px;
-  font-size: 0.9rem;
+  font-size: 0.925rem;
+  color: var(--color-text, #1e293b);
+  background-color: var(--color-bg-input, #f8fafc);
+  border: 1px solid var(--color-border, #cbd5e1);
+  border-radius: calc(var(--radius, 12px) - 4px);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kundli-form input:focus,
+.kundli-form select:focus {
+  border-color: var(--color-primary, #4f46e5);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  background-color: var(--color-surface, #ffffff);
 }
 
 .kundli-submit {
   width: 100%;
-  margin-top: 1.25rem;
+  margin-top: 1.5rem;
   min-height: 48px;
   padding: 0.75rem 1.5rem;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--color-primary, #4f46e5);
+  border: none;
+  border-radius: calc(var(--radius, 12px) - 2px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-/* --- Birth place autocomplete --- */
+.kundli-submit:hover:not(:disabled) {
+  background: var(--color-primary-hover, #4338ca);
+}
+
+.kundli-submit:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.kundli-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Spinner indicator */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #ffffff;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* --- Location Autocomplete Field --- */
 .place-input-row {
   display: flex;
   gap: 0.5rem;
@@ -102,85 +172,81 @@
   min-width: 0;
 }
 
-.place-input-wrap input {
-  width: 100%;
-}
-
 .place-suggestions {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 6px);
   left: 0;
   right: 0;
-  z-index: 20;
+  z-index: 50;
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0.25rem 0;
   max-height: 220px;
   overflow-y: auto;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #cbd5e1);
+  border-radius: calc(var(--radius, 12px) - 2px);
+  box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1));
 }
 
 .place-suggestion {
-  display: block;
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  padding: 0.6rem 0.75rem;
-  min-height: 40px;
+  padding: 0.6rem 0.85rem;
+  min-height: 42px;
   background: transparent;
-  border-radius: 0;
-  color: var(--color-text);
-  font-weight: 400;
+  border: none;
+  border-bottom: 1px solid var(--color-border-subtle, #f1f5f9);
+  color: var(--color-text, #1e293b);
   text-align: left;
-  font-size: 0.8rem;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.place-suggestion:hover,
-.place-suggestion.active {
-  background: var(--color-surface-hover);
-  color: var(--color-primary);
-}
-
-.place-suggestion.active {
-  box-shadow: inset 3px 0 0 var(--color-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
 }
 
 .place-suggestions li:last-child .place-suggestion {
   border-bottom: none;
 }
 
-.place-suggestion:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: -2px;
+.place-suggestion:hover,
+.place-suggestion.active {
+  background: var(--color-surface-hover, #f1f5f9);
+  color: var(--color-primary, #4f46e5);
+}
+
+.place-suggestion.active {
+  box-shadow: inset 3px 0 0 var(--color-primary, #4f46e5);
 }
 
 .place-suggestion-name {
-  display: block;
+  font-weight: 500;
   line-height: 1.3;
 }
 
 .place-suggestion-type {
-  display: inline-block;
-  margin-top: 0.25rem;
-  padding: 0.05rem 0.5rem;
+  align-self: flex-start;
+  margin-top: 0.2rem;
+  padding: 0.05rem 0.4rem;
   font-size: 0.65rem;
   text-transform: capitalize;
-  color: var(--color-text-muted);
-  background: var(--color-surface-hover);
-  border: 1px solid var(--color-border);
+  color: var(--color-text-muted, #64748b);
+  background: var(--color-bg-tag, #e2e8f0);
   border-radius: 999px;
 }
 
 .geocode-btn {
-  padding: 0.6rem 1rem;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  color: white;
+  padding: 0.65rem 1rem;
+  min-height: 44px;
+  background: var(--color-secondary, #0ea5e9);
+  color: #ffffff;
   font-weight: 600;
-  border-radius: var(--radius);
+  border: none;
+  border-radius: calc(var(--radius, 12px) - 4px);
   white-space: nowrap;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
 }
 
 .geocode-btn:hover:not(:disabled) {
@@ -193,21 +259,21 @@
 }
 
 .geocode-error {
-  color: var(--color-error);
-  font-size: 0.8rem;
-  margin-top: 0.25rem;
+  color: var(--color-error, #ef4444);
+  font-size: 0.775rem;
+  margin-top: 0.35rem;
 }
 
-/* --- Feedback + results --- */
+/* --- Feedback & Results --- */
 .error-banner {
-  max-width: 600px;
-  margin: 0 auto 1.5rem;
-  padding: 0.75rem 1rem;
-  background: var(--color-error-bg);
-  border: 1px solid var(--color-error-border);
-  border-left: 4px solid var(--color-error);
-  color: var(--color-error);
-  border-radius: var(--radius);
+  max-width: 760px;
+  margin: 0 auto 2rem;
+  padding: 0.85rem 1.15rem;
+  background: var(--color-error-bg, #fef2f2);
+  border: 1px solid var(--color-error-border, #fecaca);
+  border-left: 4px solid var(--color-error, #ef4444);
+  color: var(--color-error, #991b1b);
+  border-radius: var(--radius, 12px);
   font-size: 0.9rem;
 }
 
@@ -217,13 +283,18 @@
   gap: 2.5rem;
 }
 
-.kundli-results > * {
-  margin-top: 0;
-}
-
+/* --- Mobile Responsiveness --- */
 @media (max-width: 640px) {
-  .kundli-form-columns {
+  .kundli-form {
+    padding: 1.25rem;
+  }
+
+  .kundli-form-grid {
     grid-template-columns: 1fr;
-    gap: 0.75rem;
+    gap: 1.25rem;
+  }
+
+  .form-row-2col {
+    grid-template-columns: 1fr;
   }
 }
