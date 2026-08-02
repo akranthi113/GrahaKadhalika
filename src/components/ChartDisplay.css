@@ -1,25 +1,87 @@
+/* --- Outer Wrapper --- */
 .chart-display {
   max-width: 640px;
   margin: 0 auto;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
-.chart-display h2 {
+/* --- Header & Key Stats --- */
+.chart-header {
   text-align: center;
-  margin-bottom: 0.75rem;
-  color: var(--color-primary);
 }
 
+.chart-header h2 {
+  font-size: clamp(1.3rem, 3.5vw, 1.75rem);
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: var(--color-primary, #4f46e5);
+  letter-spacing: -0.01em;
+}
+
+.chart-subtitle {
+  font-size: 0.85rem;
+  color: var(--color-text-muted, #64748b);
+  font-weight: 500;
+}
+
+/* Quick Summary Pill Badges */
+.chart-quick-stats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  font-size: 0.8rem;
+}
+
+.stat-label {
+  color: var(--color-text-muted, #64748b);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.675rem;
+  letter-spacing: 0.04em;
+}
+
+.stat-value {
+  color: var(--color-text, #0f172a);
+  font-weight: 700;
+}
+
+.lagna-badge {
+  border-color: rgba(99, 102, 241, 0.4);
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.lagna-badge .stat-value {
+  color: var(--color-primary, #4f46e5);
+}
+
+/* --- Chart Outer Container --- */
 .chart-container {
   display: flex;
   justify-content: center;
-  padding: 1rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: calc(var(--radius) * 1.5);
+  padding: 1.25rem;
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: calc(var(--radius, 12px) * 1.5);
   box-shadow:
-    0 0 0 3px rgba(99, 102, 241, 0.06),
-    0 0 24px rgba(99, 102, 241, 0.1);
+    0 4px 6px -1px rgba(0, 0, 0, 0.03),
+    0 10px 15px -3px rgba(99, 102, 241, 0.08);
+  transition: box-shadow 0.3s ease;
 }
 
 .south-indian-chart {
@@ -27,55 +89,70 @@
   max-width: 520px;
 }
 
-/* The grid becomes the container the whole chart sizes against, so all
-   typography scales fluidly with the width of the chart (container query units). */
+/* --- Grid & Fluid Container Query Styling --- */
 .si-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(4, 1fr);
-  gap: 4px;
-  background: var(--color-surface);
-  border: 2px solid var(--color-primary);
-  border-radius: var(--radius);
-  padding: 4px;
+  gap: 5px;
+  background: var(--color-border-subtle, #f1f5f9);
+  border: 2px solid var(--color-primary, #4f46e5);
+  border-radius: var(--radius, 12px);
+  padding: 5px;
   aspect-ratio: 1 / 1;
   container-type: inline-size;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.02);
 }
 
+/* --- Individual House Cell --- */
 .si-house {
   position: relative;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  background: var(--color-surface-hover);
-  padding: 4px;
+  border: 1px solid var(--color-border, #cbd5e1);
+  border-radius: 8px;
+  background: var(--color-surface, #ffffff);
+  padding: 5px;
   display: flex;
   flex-direction: column;
   min-height: 0;
   min-width: 0;
   overflow: hidden;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+.si-house:hover {
+  border-color: var(--color-primary-light, #818cf8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  z-index: 2;
+}
+
+/* Lagna (Ascendant) House Highlight */
 .si-house.si-lagna {
-  border: 2px solid var(--color-primary);
-  background: rgba(99, 102, 241, 0.12);
+  border: 2px solid var(--color-primary, #4f46e5);
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.14) 0%,
+    rgba(99, 102, 241, 0.04) 100%
+  );
 }
 
+/* Header Inside Cell */
 .si-house-top {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 2px;
-  font-size: clamp(0.55rem, 3.4cqw, 0.7rem);
-  color: var(--color-text-muted);
+  font-size: clamp(0.55rem, 3.4cqw, 0.725rem);
+  color: var(--color-text-muted, #64748b);
+  line-height: 1.1;
 }
 
 .si-house-num {
   flex-shrink: 0;
   font-weight: 700;
-  color: var(--color-primary);
-  background: rgba(99, 102, 241, 0.15);
+  color: var(--color-primary, #4f46e5);
+  background: rgba(99, 102, 241, 0.12);
   border-radius: 4px;
-  padding: 1px 5px;
+  padding: 1px 4px;
   font-size: clamp(0.5rem, 2.9cqw, 0.65rem);
 }
 
@@ -87,37 +164,40 @@
   min-width: 0;
   flex-wrap: wrap;
   text-align: right;
+  font-weight: 600;
 }
 
 .si-sign-symbol {
   flex-shrink: 0;
-  color: var(--color-secondary);
+  color: var(--color-secondary, #0ea5e9);
 }
 
 .si-sign-name {
   flex: 0 1 auto;
   min-width: 0;
   line-height: 1.1;
+  color: var(--color-text-muted, #475569);
 }
 
 .si-lagna-mark {
   position: absolute;
   left: 6px;
-  top: 4px;
-  font-size: clamp(0.5rem, 2.6cqw, 0.6rem);
+  top: 5px;
+  font-size: clamp(0.5rem, 2.8cqw, 0.65rem);
   font-weight: 800;
-  color: var(--color-primary);
+  color: var(--color-primary, #4f46e5);
   letter-spacing: 0.5px;
   line-height: 1;
 }
 
+/* --- Planets Grid Inside Cell --- */
 .si-planets {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: center;
   align-content: flex-end;
-  gap: 2px 6px;
+  gap: 3px 6px;
   margin-top: auto;
   padding-top: 2px;
 }
@@ -128,26 +208,30 @@
   gap: 2px;
   font-size: clamp(0.55rem, 3.2cqw, 0.75rem);
   line-height: 1.1;
+  background: rgba(241, 245, 249, 0.6);
+  padding: 1px 3px;
+  border-radius: 3px;
 }
 
 .si-planet-symbol {
   font-size: clamp(0.6rem, 3.6cqw, 0.8rem);
   font-weight: 700;
-  color: var(--color-text);
+  color: var(--color-text, #0f172a);
   line-height: 1;
 }
 
 .si-planet-degree {
-  font-size: clamp(0.5rem, 2.6cqw, 0.6rem);
-  color: var(--color-text-muted);
+  font-size: clamp(0.48rem, 2.5cqw, 0.58rem);
+  color: var(--color-text-muted, #64748b);
 }
 
 .si-planet-retro {
   font-size: clamp(0.45rem, 2.3cqw, 0.55rem);
-  color: var(--color-accent);
-  font-weight: 700;
+  color: var(--color-accent, #e11d48);
+  font-weight: 800;
 }
 
+/* --- Central Area --- */
 .si-center {
   grid-row: 2 / 4;
   grid-column: 2 / 4;
@@ -155,28 +239,45 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 4px;
   text-align: center;
-  padding: 0 6px;
+  padding: 0.5rem;
   overflow: hidden;
-  color: var(--color-text-muted);
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.05) 0%,
+    transparent 70%
+  );
+  border-radius: var(--radius, 12px);
 }
 
 .si-center-title {
-  font-size: clamp(0.55rem, 3cqw, 0.7rem);
-  letter-spacing: 1px;
+  font-size: clamp(0.55rem, 3.2cqw, 0.725rem);
+  font-weight: 600;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
+  color: var(--color-text-muted, #64748b);
 }
 
 .si-center-sign {
-  font-size: clamp(0.65rem, 4cqw, 0.9rem);
-  font-weight: 600;
-  color: var(--color-primary);
+  font-size: clamp(0.7rem, 4.2cqw, 0.95rem);
+  font-weight: 700;
+  color: var(--color-primary, #4f46e5);
   line-height: 1.1;
 }
 
+/* --- Mobile Responsiveness --- */
 @media (max-width: 640px) {
   .chart-container {
     padding: 0.75rem;
+  }
+
+  .chart-quick-stats {
+    gap: 0.5rem;
+  }
+
+  .stat-badge {
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
   }
 }
