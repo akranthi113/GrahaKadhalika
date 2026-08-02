@@ -154,7 +154,10 @@ export default function VimsottariDasaTable({ chartData }) {
                   {activeIndex === i ? (
                     <span className="dasa-active-tag">Showing ▼</span>
                   ) : (
-                    <span className="dasa-click-hint">Click to view</span>
+                    <span className="dasa-click-hint">
+                      <span className="dasa-hint-click">Click</span>
+                      <span className="dasa-hint-tap">Tap</span> to view
+                    </span>
                   )}
                 </td>
               </tr>
@@ -196,7 +199,7 @@ export default function VimsottariDasaTable({ chartData }) {
       )}
 
       <p className="dasa-note">
-        Dasa periods are calculated from the Moon&apos;s nakshatra at birth. Click a mahadasha row to
+        Dasa periods are calculated from the Moon&apos;s nakshatra at birth. Tap a mahadasha row to
         view its antardasha breakdown.
       </p>
     </div>

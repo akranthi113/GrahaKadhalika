@@ -330,18 +330,47 @@ export default function KundliGenerator() {
 
     try {
 
+      let submitted = { ...formData }
+
+      const hasLat = submitted.birth_latitude !== '' && !isNaN(parseFloat(submitted.birth_latitude))
+
+      const hasLng = submitted.birth_longitude !== '' && !isNaN(parseFloat(submitted.birth_longitude))
+
+      if (!hasLat || !hasLng) {
+
+        if (!submitted.birth_place) {
+
+          throw new Error('Please enter a birth place, or open the coordinates panel and fill in latitude/longitude.')
+
+        }
+
+        setGeocoding(true)
+
+        setGeocodeError('')
+
+        setSuggestions([])
+
+        setShowSuggestions(false)
+
+        const { latitude, longitude } = await geocodePlace(submitted.birth_place)
+
+        submitted = {
+          ...submitted,
+          birth_latitude: latitude.toString(),
+          birth_longitude: longitude.toString(),
+          timezone: timezoneForLongitude(longitude),
+        }
+
+        setFormData(submitted)
+
+      }
+
       const chart = await calculateBirthChart(
-
-        formData.birth_date,
-
-        formData.birth_time,
-
-        parseFloat(formData.birth_latitude),
-
-        parseFloat(formData.birth_longitude),
-
-        formData.timezone
-
+        submitted.birth_date,
+        submitted.birth_time,
+        parseFloat(submitted.birth_latitude),
+        parseFloat(submitted.birth_longitude),
+        submitted.timezone
       )
 
       setChartData(chart)
@@ -354,9 +383,14 @@ export default function KundliGenerator() {
 
       setLoading(false)
 
+      setGeocoding(false)
+
     }
 
   }
+
+
+
 
 
 
@@ -550,57 +584,59 @@ export default function KundliGenerator() {
 
               </div>
 
-              <div className="form-group">
+              <details className="kundli-coords-details">
 
-                <label htmlFor="birth_latitude">Latitude</label>
+                <summary>Manually enter coordinates (optional)</summary>
 
-                <input
+                <div className="form-group">
 
-                  type="number"
+                  <label htmlFor="birth_latitude">Latitude</label>
 
-                  step="any"
+                  <input
 
-                  id="birth_latitude"
+                    type="number"
 
-                  name="birth_latitude"
+                    step="any"
 
-                  placeholder="e.g. 28.6139"
+                    id="birth_latitude"
 
-                  value={formData.birth_latitude}
+                    name="birth_latitude"
 
-                  onChange={handleChange}
+                    placeholder="e.g. 28.6139"
 
-                  required
+                    value={formData.birth_latitude}
 
-                />
+                    onChange={handleChange}
 
-              </div>
+                  />
 
-              <div className="form-group">
+                </div>
 
-                <label htmlFor="birth_longitude">Longitude</label>
+                <div className="form-group">
 
-                <input
+                  <label htmlFor="birth_longitude">Longitude</label>
 
-                  type="number"
+                  <input
 
-                  step="any"
+                    type="number"
 
-                  id="birth_longitude"
+                    step="any"
 
-                  name="birth_longitude"
+                    id="birth_longitude"
 
-                  placeholder="e.g. 77.2090"
+                    name="birth_longitude"
 
-                  value={formData.birth_longitude}
+                    placeholder="e.g. 77.2090"
 
-                  onChange={handleChange}
+                    value={formData.birth_longitude}
 
-                  required
+                    onChange={handleChange}
 
-                />
+                  />
 
-              </div>
+                </div>
+
+              </details>
 
             </div>
 

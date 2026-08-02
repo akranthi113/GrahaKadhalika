@@ -182,6 +182,42 @@
 
 /* --- Birth place autocomplete --- */
 
+.kundli-coords-details {
+
+  margin-top: 0.75rem;
+
+  border-top: 1px dashed var(--color-border);
+
+  padding-top: 0.75rem;
+
+}
+
+.kundli-coords-details summary {
+
+  cursor: pointer;
+
+  font-size: 0.8rem;
+
+  font-weight: 600;
+
+  color: var(--color-text-muted);
+
+  user-select: none;
+
+}
+
+.kundli-coords-details summary:hover {
+
+  color: var(--color-primary);
+
+}
+
+.kundli-coords-details .form-group {
+
+  margin-top: 0.75rem;
+
+}
+
 .place-input-row {
 
   display: flex;
@@ -446,6 +482,24 @@
 
 @media (max-width: 640px) {
 
+  .kundli {
+
+    padding: 1rem 0 2.5rem;
+
+  }
+
+  .kundli-container {
+
+    padding: 0 1rem;
+
+  }
+
+  .kundli-form {
+
+    padding: 1rem;
+
+  }
+
   .kundli-form-columns {
 
     grid-template-columns: 1fr;
@@ -454,9 +508,33 @@
 
   }
 
+  .place-input-row {
+
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 0.5rem;
+
+  }
+
+  .place-input-row > * {
+
+    width: 100%;
+
+  }
+
+  .geocode-btn {
+
+    width: 100%;
+
+  }
+
   .kundli-results {
 
     gap: 1.5rem;
+
+    scroll-margin-top: 5.5rem;
 
   }
 

@@ -57,6 +57,10 @@
   color: var(--color-text-muted);
 }
 
+.dasa-hint-tap {
+  display: none;
+}
+
 .dasa-antardasa {
   margin-top: 1.25rem;
   padding-top: 1rem;
@@ -80,12 +84,95 @@
 }
 
 @media (max-width: 768px) {
+  .dasa-table .table-scroll {
+    overflow-x: visible;
+  }
+
+  .dasa-table .table-scroll::after {
+    display: none;
+  }
+
   .dasa-table-inner,
   .dasa-sub-table {
     min-width: 0;
+    font-size: 0.875rem;
+  }
+
+  .dasa-table-inner thead,
+  .dasa-sub-table thead {
+    display: none;
+  }
+
+  .dasa-table-inner,
+  .dasa-table-inner tbody,
+  .dasa-table-inner tr,
+  .dasa-table-inner td,
+  .dasa-sub-table,
+  .dasa-sub-table tbody,
+  .dasa-sub-table tr,
+  .dasa-sub-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .dasa-table-inner tbody tr,
+  .dasa-sub-table tbody tr {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    margin-bottom: 0.75rem;
+    padding: 0.25rem 0;
+    box-shadow: var(--shadow);
+  }
+
+  .dasa-table-inner td,
+  .dasa-sub-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.55rem 0.9rem;
+    border-bottom: 1px solid var(--color-border);
+    white-space: normal;
+    text-align: right;
+    font-size: 0.85rem;
+  }
+
+  .dasa-table-inner td:last-child,
+  .dasa-sub-table td:last-child {
+    border-bottom: none;
+  }
+
+  .dasa-table-inner td::before,
+  .dasa-sub-table td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    font-weight: 600;
+    color: var(--color-primary);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-right: 0.75rem;
+  }
+
+  .dasa-table-inner td:first-child,
+  .dasa-sub-table td:first-child {
+    font-weight: 700;
+    color: var(--color-primary);
   }
 
   .dasa-antardasa-cell {
     white-space: normal;
+  }
+
+  .dasa-click-hint {
+    color: var(--color-text-muted);
+  }
+
+  .dasa-hint-click {
+    display: none;
+  }
+
+  .dasa-hint-tap {
+    display: inline;
   }
 }
