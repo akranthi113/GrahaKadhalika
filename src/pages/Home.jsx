@@ -6,7 +6,11 @@ export default function Home() {
   const [chatNote, setChatNote] = useState('')
 
   function handleChatClick() {
-    setChatNote('Chat consultations are coming soon. Once we are live, you can ask us anything here.')
+    setChatNote(
+      'Please click on the chat button at the right-hand corner below to start the conversation and ask. ' +
+        'We will respond to it, so please wait and keep your tab open so that anytime we respond you will get the message. ' +
+        'Just ask your questions.'
+    )
   }
 
   return (
