@@ -135,3 +135,11 @@
   color: white;
   font-weight: 700;
 }
+
+@media (max-width: 640px) {
+  .blog-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}

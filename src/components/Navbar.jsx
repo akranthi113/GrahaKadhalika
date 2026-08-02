@@ -5,6 +5,7 @@ import './Navbar.css'
 
 export default function Navbar() {
   const [user, setUser] = useState(null)
+  const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -19,44 +20,66 @@ export default function Navbar() {
     return () => subscription.unsubscribe()
   }, [])
 
+  function closeMenu() {
+    setMenuOpen(false)
+  }
+
   async function handleLogout() {
     await supabase.auth.signOut()
+    closeMenu()
     navigate('/')
   }
 
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <Link to="/" className="navbar-brand">
+        <Link to="/" className="navbar-brand" onClick={closeMenu}>
           GrahaKadhalika
         </Link>
-        <div className="navbar-links">
+        <button
+          type="button"
+          className={`navbar-toggle${menuOpen ? ' open' : ''}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-expanded={menuOpen}
+          aria-controls="navbar-links"
+          aria-label="Toggle navigation menu"
+        >
+          <span className="toggle-bar" />
+          <span className="toggle-bar" />
+          <span className="toggle-bar" />
+        </button>
+        <div id="navbar-links" className={`navbar-links${menuOpen ? ' open' : ''}`}>
           <NavLink
             to="/kundli"
+            onClick={closeMenu}
             className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
           >
             Kundli Generator
           </NavLink>
           <NavLink
             to="/charts"
+            onClick={closeMenu}
             className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
           >
             Chart Playground
           </NavLink>
           <NavLink
             to="/blogs"
+            onClick={closeMenu}
             className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
           >
             Blogs
           </NavLink>
           <NavLink
             to="/mission"
+            onClick={closeMenu}
             className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
           >
             Mission
           </NavLink>
           <NavLink
             to="/about"
+            onClick={closeMenu}
             className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
           >
             About
@@ -65,6 +88,7 @@ export default function Navbar() {
             <>
               <NavLink
                 to="/dashboard"
+                onClick={closeMenu}
                 className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
               >
                 Dashboard
@@ -74,6 +98,7 @@ export default function Navbar() {
           ) : (
             <NavLink
               to="/auth"
+              onClick={closeMenu}
               className={({ isActive }) => (isActive ? 'login-link active' : 'login-link')}
             >
               Login

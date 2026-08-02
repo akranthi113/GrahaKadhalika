@@ -94,7 +94,7 @@ export default function SouthIndianChart({ chartData }) {
                 <span className="si-house-num">{house}</span>
                 <span className="si-sign-label">
                   <span className="si-sign-symbol">{SIGN_SYMBOLS[i]}</span>
-                  {signName}
+                  <span className="si-sign-name">{signName}</span>
                 </span>
               </div>
               {isLagna && <span className="si-lagna-mark">AS</span>}

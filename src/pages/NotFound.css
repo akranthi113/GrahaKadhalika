@@ -25,3 +25,17 @@
   color: var(--color-text-muted);
   margin-bottom: 1.75rem;
 }
+
+@media (max-width: 640px) {
+  .not-found {
+    padding: 2rem 1rem;
+  }
+
+  .not-found-card {
+    padding: 2rem 1.25rem;
+  }
+
+  .not-found-card h1 {
+    font-size: clamp(3rem, 14vw, 4rem);
+  }
+}

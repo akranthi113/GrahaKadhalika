@@ -120,17 +120,17 @@ export default function VedicChartDisplay({ chartData, houses }) {
             <tbody>
               {planetRows.map((row, i) => (
                 <tr key={i}>
-                  <td>{row.planet}</td>
-                  <td>{row.sign}</td>
-                  <td>{row.position}</td>
-                  <td>{row.house}</td>
-                  <td>{row.bhava}</td>
-                  <td>{row.star}</td>
-                  <td>{row.signLord}</td>
-                  <td>{row.starLord}</td>
-                  <td>{row.subLord}</td>
-                  <td>{row.ssLord}</td>
-                  <td>{row.sssLord}</td>
+                  <td data-label="Planet">{row.planet}</td>
+                  <td data-label="Sign">{row.sign}</td>
+                  <td data-label="Position">{row.position}</td>
+                  <td data-label="House">{row.house}</td>
+                  <td data-label="Bhava">{row.bhava}</td>
+                  <td data-label="Star">{row.star}</td>
+                  <td data-label="Sign Lord">{row.signLord}</td>
+                  <td data-label="Star Lord">{row.starLord}</td>
+                  <td data-label="Sub Lord">{row.subLord}</td>
+                  <td data-label="SS Lord">{row.ssLord}</td>
+                  <td data-label="SSS Lord">{row.sssLord}</td>
                 </tr>
               ))}
             </tbody>
@@ -168,15 +168,15 @@ export default function VedicChartDisplay({ chartData, houses }) {
 
                   return (
                     <tr key={i}>
-                      <td>{i + 1}</td>
-                      <td>{signAbbrev}</td>
-                      <td>{formatPosition(cusp.longitude % 30)}</td>
-                      <td>{nakshatraInfo.name}</td>
-                      <td>{signLord}</td>
-                      <td>{nakshatraInfo.lord}</td>
-                      <td>{subLord}</td>
-                      <td>-</td>
-                      <td>-</td>
+                      <td data-label="House">{i + 1}</td>
+                      <td data-label="Sign">{signAbbrev}</td>
+                      <td data-label="Position">{formatPosition(cusp.longitude % 30)}</td>
+                      <td data-label="Star">{nakshatraInfo.name}</td>
+                      <td data-label="Sign Lord">{signLord}</td>
+                      <td data-label="Star Lord">{nakshatraInfo.lord}</td>
+                      <td data-label="Sub Lord">{subLord}</td>
+                      <td data-label="SS Lord">-</td>
+                      <td data-label="SSS Lord">-</td>
                     </tr>
                   )
                 })}

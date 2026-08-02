@@ -139,13 +139,13 @@ export default function VimsottariDasaTable({ chartData }) {
                   .filter(Boolean)
                   .join(' ')}
               >
-                <td>
+                <td data-label="Planet / Lord">
                   <span className="dasa-lord">{row.abbr}</span> {row.id}
                 </td>
-                <td>{row.years} yrs</td>
-                <td>{row.start}</td>
-                <td>{row.end}</td>
-                <td className="dasa-antardasa-cell">
+                <td data-label="Dasa Period">{row.years} yrs</td>
+                <td data-label="Start Date">{row.start}</td>
+                <td data-label="End Date">{row.end}</td>
+                <td data-label="Antardasa" className="dasa-antardasa-cell">
                   {activeIndex === i ? (
                     <span className="dasa-active-tag">Showing ▼</span>
                   ) : (
@@ -176,12 +176,12 @@ export default function VimsottariDasaTable({ chartData }) {
               <tbody>
                 {selected.subs.map((sub, j) => (
                   <tr key={j}>
-                    <td>
+                    <td data-label="Planet / Lord">
                       <span className="dasa-lord">{sub.abbr}</span> {sub.id}
                     </td>
-                    <td>{sub.years} yrs</td>
-                    <td>{sub.start}</td>
-                    <td>{sub.end}</td>
+                    <td data-label="Period">{sub.years} yrs</td>
+                    <td data-label="Start Date">{sub.start}</td>
+                    <td data-label="End Date">{sub.end}</td>
                   </tr>
                 ))}
               </tbody>

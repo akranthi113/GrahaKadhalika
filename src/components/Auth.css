@@ -72,3 +72,13 @@
 .text-btn:hover {
   text-decoration: underline;
 }
+
+@media (max-width: 640px) {
+  .auth-container {
+    padding: 1rem;
+  }
+
+  .auth-card {
+    padding: 1.5rem;
+  }
+}

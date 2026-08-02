@@ -158,4 +158,46 @@
   .chart-container {
     padding: 0.75rem;
   }
+
+  .si-house-top {
+    font-size: 0.8rem;
+  }
+
+  .si-house-num {
+    font-size: 0.75rem;
+  }
+
+  .si-lagna-mark {
+    font-size: 0.7rem;
+  }
+
+  .si-planet {
+    font-size: 0.85rem;
+  }
+
+  .si-planet-symbol {
+    font-size: 0.9rem;
+  }
+
+  .si-planet-degree {
+    font-size: 0.75rem;
+  }
+
+  .si-center-title {
+    font-size: 0.8rem;
+  }
+
+  .si-center-sign {
+    font-size: 1.05rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .si-sign-name {
+    display: none;
+  }
+
+  .si-sign-label {
+    justify-content: flex-end;
+  }
 }

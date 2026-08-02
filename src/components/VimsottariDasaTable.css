@@ -74,3 +74,14 @@
   font-size: 0.8rem;
   color: var(--color-text-muted);
 }
+
+@media (max-width: 768px) {
+  .dasa-table-inner,
+  .dasa-sub-table {
+    min-width: 0;
+  }
+
+  .dasa-antardasa-cell {
+    white-space: normal;
+  }
+}
