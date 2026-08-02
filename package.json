@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://vibha.github.io/GrahaKadhalika",
+  "homepage": "https://akranthi113.github.io/GrahaKadhalika",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
