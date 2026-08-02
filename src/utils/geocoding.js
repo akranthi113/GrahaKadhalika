@@ -24,8 +24,10 @@ export async function geocodePlace(place) {
   }
 }
 
+const PLACE_TYPES = new Set(['city', 'town', 'village', 'borough', 'suburb', 'municipality', 'state', 'administrative', 'county'])
+
 export async function searchPlaces(query) {
-  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=6&addressdetails=1`
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=12&addressdetails=1`
   const response = await fetch(url, {
     headers: HEADERS,
   })
@@ -36,9 +38,28 @@ export async function searchPlaces(query) {
 
   const data = await response.json()
 
-  return data.map((place) => ({
-    name: place.display_name,
-    latitude: parseFloat(place.lat),
-    longitude: parseFloat(place.lon),
-  }))
+  const seen = new Set()
+  const results = []
+
+  for (const place of data) {
+    const name = place?.display_name
+    if (!name) continue
+
+    const type = place?.type || place?.addresstype || ''
+    const isPlace = PLACE_TYPES.has(type)
+
+    const key = name.toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+
+    results.push({
+      name,
+      type,
+      isPlace,
+      latitude: parseFloat(place.lat),
+      longitude: parseFloat(place.lon),
+    })
+  }
+
+  return results.sort((a, b) => (b.isPlace ? 1 : 0) - (a.isPlace ? 1 : 0))
 }

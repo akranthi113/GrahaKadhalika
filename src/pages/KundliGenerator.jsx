@@ -282,7 +282,10 @@ export default function KundliGenerator() {
                               onClick={() => selectPlace(suggestion)}
                               onMouseEnter={() => setActiveIndex(i)}
                             >
-                              {suggestion.name}
+                              <span className="place-suggestion-name">{suggestion.name}</span>
+                              {suggestion.isPlace && suggestion.type && (
+                                <span className="place-suggestion-type">{suggestion.type}</span>
+                              )}
                             </button>
                           </li>
                         ))}
