@@ -454,4 +454,16 @@
 
   }
 
+  .kundli-results {
+
+    gap: 1.5rem;
+
+  }
+
+  .kundli-results > * {
+
+    margin-top: 0;
+
+  }
+
 }
