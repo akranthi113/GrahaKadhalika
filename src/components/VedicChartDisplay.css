@@ -109,6 +109,11 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
+    padding-bottom: 0.5rem;
+  }
+
+  .table-scroll::after {
+    display: none;
   }
 
   .vedic-table {
