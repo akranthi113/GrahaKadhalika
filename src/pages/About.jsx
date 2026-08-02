@@ -1,8 +1,15 @@
+import { useDocumentMeta } from '../hooks/useDocumentMeta'
 import './About.css'
 
 export default function About() {
+  useDocumentMeta({
+    title: 'About Us - GrahaKadhalika',
+    description:
+      'Learn about GrahaKadhalika, a free Vedic astrology passion project inspired by the continuous movement of the planets and the power of free will.',
+  })
+
   return (
-    <div className="about">
+    <main className="about">
       <section className="about-hero">
         <h1>About GrahaKadhalika</h1>
         <p className="about-tagline">
@@ -81,6 +88,6 @@ export default function About() {
           "The planets may influence the path, but your choices determine the destination."
         </blockquote>
       </div>
-    </div>
+    </main>
   )
 }

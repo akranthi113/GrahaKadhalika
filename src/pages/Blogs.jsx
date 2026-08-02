@@ -1,12 +1,19 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../utils/supabaseClient'
+import { useDocumentMeta } from '../hooks/useDocumentMeta'
 import './Blogs.css'
 
 export default function Blogs() {
   const [blogs, setBlogs] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+
+  useDocumentMeta({
+    title: 'Astrology Blogs - GrahaKadhalika',
+    description:
+      'Explore astrology articles and insights on Vedic astrology, kundli analysis, planets, houses and life predictions from GrahaKadhalika.',
+  })
 
   useEffect(() => {
     async function fetchBlogs() {
@@ -38,7 +45,7 @@ export default function Blogs() {
   }
 
   return (
-    <div className="blogs-page">
+    <main className="blogs-page">
       <div className="blogs-container">
         <h1>Astrology Blogs</h1>
         {error ? (
@@ -66,6 +73,6 @@ export default function Blogs() {
           </div>
         )}
       </div>
-    </div>
+    </main>
   )
 }

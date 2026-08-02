@@ -1,8 +1,15 @@
+import { useDocumentMeta } from '../hooks/useDocumentMeta'
 import './Mission.css'
 
 export default function Mission() {
+  useDocumentMeta({
+    title: 'Our Mission - GrahaKadhalika',
+    description:
+      'Our mission is to bring authentic, thoughtful Vedic astrology back — free, patient, and personal. Understand yourself and make better decisions through free will.',
+  })
+
   return (
-    <div className="mission">
+    <main className="mission">
       <section className="mission-hero">
         <h1>Our Mission</h1>
       </section>
@@ -101,6 +108,6 @@ export default function Mission() {
           responsible astrological analysis.
         </blockquote>
       </div>
-    </div>
+    </main>
   )
 }

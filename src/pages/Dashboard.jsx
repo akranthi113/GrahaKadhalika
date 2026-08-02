@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../utils/supabaseClient'
+import { useDocumentMeta } from '../hooks/useDocumentMeta'
 import AddBlog from '../components/AddBlog'
 import './Dashboard.css'
 
@@ -14,6 +15,10 @@ function BlogIcon() {
 }
 
 export default function Dashboard() {
+  useDocumentMeta({
+    title: 'Dashboard - GrahaKadhalika',
+    description: 'Manage your blog posts on GrahaKadhalika.',
+  })
   const [user, setUser] = useState(null)
   const [blogs, setBlogs] = useState([])
   const [loading, setLoading] = useState(true)

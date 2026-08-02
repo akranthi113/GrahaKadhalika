@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useDocumentMeta } from '../hooks/useDocumentMeta'
 import './ChartPlayground.css'
 
 const base = import.meta.env.BASE_URL
@@ -28,8 +29,14 @@ const CHARTS = [
 ]
 
 export default function ChartPlayground() {
+  useDocumentMeta({
+    title: 'Vedic Chart Playground - GrahaKadhalika',
+    description:
+      'Explore interactive Vedic chart visualizations: a 3D North Indian chart, a sidereal astrology playground, and an enhanced South Indian chart.',
+  })
+
   return (
-    <div className="playground">
+    <main className="playground">
       <div className="playground-container">
         <nav className="playground-breadcrumb" aria-label="Breadcrumb">
           <Link to="/">← Back to Home</Link>
@@ -60,6 +67,6 @@ export default function ChartPlayground() {
           ))}
         </div>
       </div>
-    </div>
+    </main>
   )
 }

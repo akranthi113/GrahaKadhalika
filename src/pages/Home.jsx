@@ -1,9 +1,35 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useDocumentMeta } from '../hooks/useDocumentMeta'
 import './Home.css'
 
 export default function Home() {
   const [chatNote, setChatNote] = useState('')
+
+  useDocumentMeta({
+    title: 'GrahaKadhalika - Free Vedic Astrology Consultation & Kundli Generator',
+    description:
+      'GrahaKadhalika offers 100% free Vedic astrology consultation. Generate your sidereal Lahiri kundli, explore South Indian rasi charts, and get detailed planet, house and dasa analysis.',
+  })
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        name: 'GrahaKadhalika',
+        url: 'https://akranthi113.github.io/GrahaKadhalika/',
+        description:
+          'Free Vedic astrology consultations with authentic kundli generation and detailed planet, house and dasa analysis.',
+      },
+      {
+        '@type': 'Organization',
+        name: 'GrahaKadhalika',
+        url: 'https://akranthi113.github.io/GrahaKadhalika/',
+        slogan: '100% Free Astrology Consultation',
+      },
+    ],
+  }
 
   function handleChatClick() {
     setChatNote(
@@ -14,7 +40,11 @@ export default function Home() {
   }
 
   return (
-    <div className="home">
+    <main className="home">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <section className="hero">
         <p className="hero-tagline">
           Astrology gives you a way to understand life—not to control it.
@@ -97,6 +127,6 @@ export default function Home() {
           Explore Chart Playgrounds
         </Link>
       </section>
-    </div>
+    </main>
   )
 }

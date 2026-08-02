@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../utils/supabaseClient'
+import { useDocumentMeta } from '../hooks/useDocumentMeta'
 import './Auth.css'
 
 export default function Auth() {
+  useDocumentMeta({
+    title: 'Login - GrahaKadhalika',
+    description: 'Log in to GrahaKadhalika to manage your account and blog posts.',
+  })
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSignUp, setIsSignUp] = useState(false)
