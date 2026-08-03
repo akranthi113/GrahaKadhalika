@@ -161,7 +161,10 @@ export default function ContactForm() {
     const { error: insertError } = await supabase.from('contact_requests').insert([insertPayload])
 
     if (insertError) {
-      setStatus({ type: 'error', text: 'Failed to submit your request. Please try again later.' })
+      setStatus({
+        type: 'error',
+        text: 'Failed to submit your request. ' + (insertError.message || 'Please try again later.'),
+      })
       setSubmitting(false)
       return
     }
