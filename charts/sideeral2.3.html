@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>AstroPro · Chart Builder</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap');
+
+        :root {
+            --bg: #f5f0eb;
+            --surface: #ffffff;
+            --border: #ddd5c8;
+            --border-mid: #c8bdb0;
+            --text: #2c2416;
+            --text-dim: #8a7a68;
+            --accent: #7c5c2e;
+            --accent2: #c0392b;
+            --sun: #c47a0a;
+            --moon: #4a6d9a;
+            --mercury: #6b2fae;
+            --venus: #b01050;
+            --mars: #b52020;
+            --jupiter: #985200;
+            --saturn: #246b5e;
+            --asc-color: #c0392b;
+            --mc-color: #2c6e8a;
+            --chart-bg: #fffef8;
+            --chart-sector: #faf6f0;
+            --chart-sector-alt: #f5ede4;
+            --chart-line: #d4c9bc;
+            --chart-line-major: #a89882;
+            --zodiac-fill: #a89882;
+            --house-num-fill: #c8b8a8;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html { overscroll-behavior: none; }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Crimson Pro', Georgia, serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px 12px 40px;
+            background-image:
+                radial-gradient(ellipse at 30% 10%, rgba(180,140,80,0.07) 0%, transparent 55%),
+                radial-gradient(ellipse at 70% 90%, rgba(120,80,180,0.04) 0%, transparent 55%);
+            user-select: none;
+            -webkit-user-select: none;
+            cursor: default;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.28em;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin: 0 0 14px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* ── Chart ── */
+        .chart-wrapper {
+            width: 100%;
+            aspect-ratio: 1/1;
+            position: relative;
+            touch-action: none;
+            border-radius: 50%;
+            background: var(--chart-bg);
+            box-shadow:
+                0 0 0 1px var(--border),
+                0 4px 24px rgba(100,70,30,0.12),
+                inset 0 0 40px rgba(200,180,150,0.08);
+            transition: box-shadow 0.2s;
+        }
+
+        .chart-wrapper.drag-over {
+            box-shadow:
+                0 0 0 2.5px var(--accent),
+                0 4px 32px rgba(124,92,46,0.22),
+                inset 0 0 40px rgba(200,180,150,0.08);
+        }
+
+        .chart-wrapper.asc-drag-active {
+            box-shadow:
+                0 0 0 2.5px var(--asc-color),
+                0 4px 32px rgba(192,57,43,0.22),
+                inset 0 0 40px rgba(200,180,150,0.08);
+        }
+
+        svg { width: 100%; height: 100%; display: block; overflow: visible; }
+
+        .house-sector     { fill: var(--chart-sector);     stroke: var(--chart-line); stroke-width: 0.7; }
+        .house-sector-alt { fill: var(--chart-sector-alt); stroke: var(--chart-line); stroke-width: 0.7; }
+        .tick-line        { stroke: var(--chart-line);       stroke-width: 0.7; }
+        .tick-major       { stroke: var(--chart-line-major); stroke-width: 1.4; }
+
+        .zodiac-text {
+            font-size: 15px;
+            fill: var(--zodiac-fill);
+            font-family: 'Cinzel', serif;
+            pointer-events: all;
+            cursor: default;
+            transition: fill 0.15s;
+        }
+        .zodiac-text:hover { fill: var(--accent); }
+
+        .house-num {
+            font-size: 9px;
+            fill: var(--house-num-fill);
+            font-weight: 800;
+            font-family: 'Cinzel', serif;
+            pointer-events: none;
+        }
+
+        .degree-label {
+            font-size: 9px;
+            fill: var(--text-dim);
+            font-weight: 400;
+            pointer-events: none;
+            font-family: 'Crimson Pro', serif;
+        }
+
+        .chart-planet {
+            font-size: 22px;
+            cursor: move;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            transition: font-size 0.12s, filter 0.12s;
+        }
+        .chart-planet:hover { font-size: 27px; }
+        .chart-planet.scrubbing {
+            font-size: 28px;
+            filter: drop-shadow(0 0 6px currentColor);
+            cursor: ew-resize;
+        }
+
+        /* ── ASC Drag Handle ── */
+        .asc-handle {
+            cursor: grab;
+            transition: opacity 0.15s;
+        }
+        .asc-handle:hover .asc-handle-circle { opacity: 1; }
+        .asc-handle-circle {
+            fill: var(--asc-color);
+            opacity: 0.15;
+            transition: opacity 0.15s, r 0.15s;
+        }
+        .asc-handle-circle.dragging {
+            opacity: 0.3;
+            r: 16;
+        }
+        .asc-axis-line { stroke: var(--asc-color); stroke-width: 1.8; stroke-dasharray: 4,3; opacity: 0.55; pointer-events: none; }
+        .mc-axis-line  { stroke: var(--mc-color);  stroke-width: 1.4; stroke-dasharray: 3,4; opacity: 0.45; pointer-events: none; }
+
+        .asc-label-text {
+            font-size: 9px;
+            fill: var(--asc-color);
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            pointer-events: none;
+        }
+        .dc-label-text {
+            font-size: 9px;
+            fill: var(--asc-color);
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        .mc-label-text {
+            font-size: 9px;
+            fill: var(--mc-color);
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            pointer-events: none;
+        }
+        .ic-label-text {
+            font-size: 9px;
+            fill: var(--mc-color);
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        /* ── ASC Degree Badge ── */
+        .asc-degree-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.92);
+            border: 1px solid rgba(192,57,43,0.3);
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            color: var(--asc-color);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+            text-align: center;
+            z-index: 10;
+        }
+        .asc-degree-badge.visible { opacity: 1; }
+
+        /* ── Tooltip ── */
+        #tooltip {
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            background: var(--surface);
+            border: 1px solid var(--border-mid);
+            color: var(--text);
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            letter-spacing: 0.07em;
+            padding: 5px 11px 4px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(100,70,30,0.14);
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.14s, transform 0.14s;
+            left: -9999px;
+        }
+        #tooltip.visible { opacity: 1; transform: translateY(0); }
+
+        /* ── ASC Info Panel ── */
+        .asc-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            padding: 10px 16px;
+            background: var(--surface);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(100,70,30,0.06);
+        }
+        .axis-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+        }
+        .axis-label {
+            font-family: 'Cinzel', serif;
+            font-size: 8px;
+            letter-spacing: 0.18em;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+        .axis-value {
+            font-family: 'Cinzel', serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        .axis-value.asc-val { color: var(--asc-color); }
+        .axis-value.mc-val  { color: var(--mc-color); }
+        .axis-value.dc-val  { color: var(--asc-color); opacity: 0.65; }
+        .axis-value.ic-val  { color: var(--mc-color); opacity: 0.65; }
+        .axis-divider {
+            width: 1px;
+            height: 28px;
+            background: var(--border);
+        }
+
+        /* ── Planet Bank ── */
+        .bank-label {
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            color: var(--text-dim);
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .bank {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            padding: 12px;
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 10px rgba(100,70,30,0.06);
+            touch-action: pan-y;
+        }
+
+        .planet-btn {
+            aspect-ratio: 1/1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            font-size: 20px;
+            line-height: 1;
+            cursor: grab;
+            background: var(--bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 4px rgba(100,70,30,0.07);
+            transition: transform 0.15s, opacity 0.2s, box-shadow 0.2s, background 0.15s;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            touch-action: none;
+        }
+
+        .planet-btn .pname {
+            font-family: 'Cinzel', serif;
+            font-size: 5.5px;
+            letter-spacing: 0.03em;
+            color: var(--text-dim);
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        .planet-btn:hover     { transform: scale(1.09); box-shadow: 0 4px 12px rgba(100,70,30,0.14); }
+        .planet-btn.dragging  { opacity: 0.35; transform: scale(0.94); }
+        .planet-btn.placed    { opacity: 0.18; filter: grayscale(1); pointer-events: none; }
+
+        #touch-ghost {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 40px;
+            line-height: 1;
+            transform: translate(-50%, -50%);
+            opacity: 0.9;
+            filter: drop-shadow(0 3px 8px rgba(0,0,0,0.18));
+            display: none;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .hint {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-dim);
+            font-style: italic;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .ui-btn {
+            width: 100%;
+            padding: 13px;
+            border-radius: 12px;
+            border: 1px solid #e8c8c8;
+            background: #fff5f5;
+            color: #c0392b;
+            font-weight: 700;
+            font-size: 12px;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.12em;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
+            touch-action: manipulation;
+        }
+        .ui-btn:hover { background: #fdecea; box-shadow: 0 4px 16px rgba(192,57,43,0.10); }
+
+        .c-sun     { fill: var(--sun);     color: var(--sun); }
+        .c-moon    { fill: var(--moon);    color: var(--moon); }
+        .c-mercury { fill: var(--mercury); color: var(--mercury); }
+        .c-venus   { fill: var(--venus);   color: var(--venus); }
+        .c-mars    { fill: var(--mars);    color: var(--mars); }
+        .c-jupiter { fill: var(--jupiter); color: var(--jupiter); }
+        .c-saturn  { fill: var(--saturn);  color: var(--saturn); }
+    </style>
+</head>
+<body>
+<a href="../charts" style="position:fixed;top:12px;left:12px;z-index:99999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;font:600 14px/1.2 system-ui,-apple-system,'Segoe UI',sans-serif;color:#fff;background:rgba(30,30,46,0.88);border:1px solid rgba(99,102,241,0.8);border-radius:8px;text-decoration:none;backdrop-filter:blur(4px);box-shadow:0 2px 12px rgba(0,0,0,0.45)">&#8592; Back to Charts</a>
+
+<div id="touch-ghost"></div>
+<div id="tooltip"></div>
+
+<div class="container">
+    <h1>✦ Astro Chart Builder</h1>
+
+    <div class="chart-wrapper" id="dropzone">
+        <svg id="chart" viewBox="0 0 400 400">
+            <defs>
+                <radialGradient id="chartGrad" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%"   stop-color="#fffef8"/>
+                    <stop offset="100%" stop-color="#f4ece0"/>
+                </radialGradient>
+            </defs>
+            <circle cx="200" cy="200" r="196" fill="url(#chartGrad)" stroke="#ddd5c8" stroke-width="1"/>
+            <circle cx="200" cy="200" r="115" fill="#faf8f3"          stroke="#ddd5c8" stroke-width="0.8"/>
+            <g id="ticks-layer"></g>
+            <g id="houses-layer"></g>
+            <g id="zodiac-layer"></g>
+            <g id="axes-layer"></g>
+            <g id="planets-layer"></g>
+            <g id="asc-handle-layer"></g>
+        </svg>
+        <div class="asc-degree-badge" id="ascBadge"></div>
+    </div>
+
+    <p class="hint">
+        Drag planets onto the chart ring · Hover to see details · Slide to adjust degree<br>
+        <strong style="font-style:normal;color:var(--asc-color)">Drag the ASC marker</strong> to rotate the entire zodiac wheel · Double-tap to remove planet
+    </p>
+
+    <!-- ASC / MC Info Panel -->
+    <div class="asc-info" id="ascInfo">
+        <div class="axis-item">
+            <span class="axis-label">ASC</span>
+            <span class="axis-value asc-val" id="ascVal">Aries 0°</span>
+        </div>
+        <div class="axis-divider"></div>
+        <div class="axis-item">
+            <span class="axis-label">DC</span>
+            <span class="axis-value dc-val" id="dcVal">Libra 0°</span>
+        </div>
+        <div class="axis-divider"></div>
+        <div class="axis-item">
+            <span class="axis-label">MC</span>
+            <span class="axis-value mc-val" id="mcVal">Capricorn 0°</span>
+        </div>
+        <div class="axis-divider"></div>
+        <div class="axis-item">
+            <span class="axis-label">IC</span>
+            <span class="axis-value ic-val" id="icVal">Cancer 0°</span>
+        </div>
+    </div>
+
+    <div class="bank-label">Planets</div>
+    <div class="bank" id="bank">
+        <button class="planet-btn c-sun"     data-id="sun">☉<span class="pname">Sun</span></button>
+        <button class="planet-btn c-moon"    data-id="moon">☽<span class="pname">Moon</span></button>
+        <button class="planet-btn c-mercury" data-id="mercury">☿<span class="pname">Mercury</span></button>
+        <button class="planet-btn c-venus"   data-id="venus">♀<span class="pname">Venus</span></button>
+        <button class="planet-btn c-mars"    data-id="mars">♂<span class="pname">Mars</span></button>
+        <button class="planet-btn c-jupiter" data-id="jupiter">♃<span class="pname">Jupiter</span></button>
+        <button class="planet-btn c-saturn"  data-id="saturn">♄<span class="pname">Saturn</span></button>
+    </div>
+
+    <button class="ui-btn" id="resetBtn">✕ Clear Chart</button>
+</div>
+
+<script>
+(() => {
+    'use strict';
+
+    const svgNS        = "http://www.w3.org/2000/svg";
+    const CENTER       = 200;
+    const INNER_R      = 115;
+    const OUTER_R      = 185;
+    const MID_R        = 148;
+    const VIEWBOX_SIZE = 400;
+    const RING_MIN_R   = INNER_R;
+    const RING_MAX_R   = OUTER_R;
+
+    // ── State ──────────────────────────────────────────────────────────────────
+    // ascDeg: the zodiac degree (0–360) currently AT the ASC position (left horizon)
+    // Planets store absolute totalDeg (0–360 in zodiac space)
+    let ascDeg = 0; // Aries 0° on the ASC by default
+
+    const chartState = new Map(); // planetId → { totalDeg: 0–360 in zodiac }
+
+    const SYMBOLS      = { sun:"☉", moon:"☽", mercury:"☿", venus:"♀", mars:"♂", jupiter:"♃", saturn:"♄" };
+    const PLANET_NAMES = { sun:"Sun", moon:"Moon", mercury:"Mercury", venus:"Venus", mars:"Mars", jupiter:"Jupiter", saturn:"Saturn" };
+    const ZODIAC_SYM   = ["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
+    const ZODIAC_NAMES = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+
+    function mod360(v) { return ((v % 360) + 360) % 360; }
+    function getZodiacHouse(deg) { return Math.floor(mod360(deg) / 30); }
+    function getZodiacDeg(deg)   { return mod360(deg) % 30; }
+
+    // Convert zodiac degree → screen angle (radians)
+    // ASC sits at the LEFT horizon (180° in screen angle convention, i.e. leftward)
+    // Screen angle: 0° = right, 90° = down, 180° = left
+    // ASC should be at screen angle 180°
+    // A planet at zodiac deg D: screen_angle = 180° + (ascDeg - D)   [zodiac goes counter-clockwise on screen]
+    function zodiacToScreenAngle(zodiacDeg) {
+        return degToRad(180 - (zodiacDeg - ascDeg));
+    }
+
+    function degToRad(d) { return d * Math.PI / 180; }
+    function pt(r, a) { return { x: CENTER + r * Math.cos(a), y: CENTER + r * Math.sin(a) }; }
+
+    function createSVGEl(tag, attrs) {
+        const el = document.createElementNS(svgNS, tag);
+        for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+        return el;
+    }
+
+    function addSVGText(val, r, a, cls, parent) {
+        const p = pt(r, a);
+        const t = createSVGEl("text", { x: p.x, y: p.y, class: cls, "text-anchor": "middle", "dominant-baseline": "middle" });
+        t.textContent = val;
+        parent.appendChild(t);
+        return t;
+    }
+
+    // ── Screen ↔ Zodiac conversion ─────────────────────────────────────────────
+    function clientToZodiacDeg(clientX, clientY) {
+        const rect   = dropzone.getBoundingClientRect();
+        const scaleX = VIEWBOX_SIZE / rect.width;
+        const scaleY = VIEWBOX_SIZE / rect.height;
+        const vbX    = (clientX - rect.left) * scaleX;
+        const vbY    = (clientY - rect.top)  * scaleY;
+        // screen angle from center
+        const screenAngleDeg = Math.atan2(vbY - CENTER, vbX - CENTER) * 180 / Math.PI;
+        // invert the zodiacToScreenAngle formula: zodiacDeg = ascDeg - (screenAngle - 180)
+        return mod360(ascDeg - (screenAngleDeg - 180));
+    }
+
+    function isInRing(clientX, clientY) {
+        const rect   = dropzone.getBoundingClientRect();
+        const scaleX = VIEWBOX_SIZE / rect.width;
+        const scaleY = VIEWBOX_SIZE / rect.height;
+        const vbX    = (clientX - rect.left) * scaleX;
+        const vbY    = (clientY - rect.top)  * scaleY;
+        const dist   = Math.sqrt((vbX - CENTER) ** 2 + (vbY - CENTER) ** 2);
+        return dist >= RING_MIN_R && dist <= RING_MAX_R;
+    }
+
+    function isOverDropzoneCircle(clientX, clientY) {
+        const rect   = dropzone.getBoundingClientRect();
+        const scaleX = VIEWBOX_SIZE / rect.width;
+        const scaleY = VIEWBOX_SIZE / rect.height;
+        const vbX    = (clientX - rect.left) * scaleX;
+        const vbY    = (clientY - rect.top)  * scaleY;
+        const dist   = Math.sqrt((vbX - CENTER) ** 2 + (vbY - CENTER) ** 2);
+        return dist <= OUTER_R + 14;
+    }
+
+    // Is a point near the ASC handle? (within ~20px of outer ring on left side)
+    function isNearAscHandle(clientX, clientY) {
+        const rect   = dropzone.getBoundingClientRect();
+        const scaleX = VIEWBOX_SIZE / rect.width;
+        const scaleY = VIEWBOX_SIZE / rect.height;
+        const vbX    = (clientX - rect.left) * scaleX;
+        const vbY    = (clientY - rect.top)  * scaleY;
+        const dist   = Math.sqrt((vbX - CENTER) ** 2 + (vbY - CENTER) ** 2);
+        if (dist < OUTER_R - 24 || dist > OUTER_R + 28) return false;
+        // Check angle is near ASC position (left side, screen angle 180°)
+        const screenAngleDeg = Math.atan2(vbY - CENTER, vbX - CENTER) * 180 / Math.PI;
+        const ascScreenAngle = 180; // ASC is always at left (180°)
+        let diff = Math.abs(screenAngleDeg - ascScreenAngle);
+        if (diff > 180) diff = 360 - diff;
+        return diff < 22; // within ~22 degrees of ASC marker
+    }
+
+    // ── Gesture State ──────────────────────────────────────────────────────────
+    const gesture = {
+        mode: null, // null | 'drag-from-bank' | 'scrub' | 'drag-asc'
+        planetId: null,
+        startX: 0, startY: 0,
+        startTotalDeg: 0,
+        startAngle: 0,
+        startAscDeg: 0,
+        moved: false,
+        movePixels: 0,
+    };
+
+    const ghost    = document.getElementById("touch-ghost");
+    const dropzone = document.getElementById("dropzone");
+    const ascBadge = document.getElementById("ascBadge");
+
+    // ── Tooltip ─────────────────────────────────────────────────────────────────
+    const tipEl = document.getElementById("tooltip");
+    let tipTO = null;
+
+    function updateTipText(text) { tipEl.textContent = text; }
+    function showTip(text, x, y) {
+        clearTimeout(tipTO);
+        tipEl.textContent = text;
+        tipEl.classList.add("visible");
+        positionTip(x, y);
+    }
+    function positionTip(x, y) {
+        tipEl.style.left = "-9999px"; tipEl.style.top = "-9999px";
+        const tw = tipEl.offsetWidth, th = tipEl.offsetHeight;
+        let tx = x + 14, ty = y - th - 10;
+        if (tx + tw > window.innerWidth - 8)  tx = x - tw - 14;
+        if (ty < 8) ty = y + 16;
+        tipEl.style.left = tx + "px"; tipEl.style.top = ty + "px";
+    }
+    function hideTip(delay) {
+        clearTimeout(tipTO);
+        tipTO = setTimeout(() => tipEl.classList.remove("visible"), delay ?? 0);
+    }
+
+    // ── ASC Degree Badge ────────────────────────────────────────────────────────
+    function showAscBadge(zodiacDeg) {
+        const house = getZodiacHouse(zodiacDeg);
+        const deg   = Math.floor(getZodiacDeg(zodiacDeg));
+        ascBadge.textContent = `ASC  ${ZODIAC_NAMES[house]} ${deg}°`;
+        ascBadge.classList.add("visible");
+    }
+    function hideAscBadge() { ascBadge.classList.remove("visible"); }
+
+    // ── Axis Info Panel Update ──────────────────────────────────────────────────
+    function formatAxisDeg(zodiacDeg) {
+        const house = getZodiacHouse(mod360(zodiacDeg));
+        const deg   = Math.floor(getZodiacDeg(mod360(zodiacDeg)));
+        return `${ZODIAC_NAMES[house]} ${deg}°`;
+    }
+
+    function updateAxisPanel() {
+        const asc = ascDeg;
+        const dc  = mod360(ascDeg + 180);
+        const mc  = mod360(ascDeg + 90);  // MC is 90° ahead of ASC (top of chart)
+        const ic  = mod360(ascDeg + 270);
+        document.getElementById("ascVal").textContent = formatAxisDeg(asc);
+        document.getElementById("dcVal").textContent  = formatAxisDeg(dc);
+        document.getElementById("mcVal").textContent  = formatAxisDeg(mc);
+        document.getElementById("icVal").textContent  = formatAxisDeg(ic);
+    }
+
+    // ── Init static chart ──────────────────────────────────────────────────────
+    function init() {
+        const ticksG  = document.getElementById("ticks-layer");
+
+        for (let d = 0; d < 360; d++) {
+            const a   = zodiacToScreenAngle(d);
+            const maj = d % 30 === 0;
+            const mid = d % 5  === 0;
+            const len = maj ? 12 : (mid ? 7 : 4);
+            ticksG.appendChild(createSVGEl("line", {
+                x1: pt(OUTER_R, a).x, y1: pt(OUTER_R, a).y,
+                x2: pt(OUTER_R - len, a).x, y2: pt(OUTER_R - len, a).y,
+                class: maj ? "tick-major" : "tick-line"
+            }));
+        }
+        updateAxisPanel();
+    }
+
+    // ── Render dynamic layers (houses, zodiac glyphs, planets, axes, asc handle) ──
+    function render() {
+        renderZodiacWheel();
+        renderAxes();
+        renderPlanets();
+        renderAscHandle();
+        updateAxisPanel();
+    }
+
+    function renderZodiacWheel() {
+        const housesG = document.getElementById("houses-layer");
+        const zodiacG = document.getElementById("zodiac-layer");
+        housesG.innerHTML = "";
+        zodiacG.innerHTML = "";
+
+        for (let i = 0; i < 12; i++) {
+            // Each house sector in zodiac space = 30° starting at ascDeg + i*30? 
+            // No: houses are fixed to ASC. House 1 starts at ASC.
+            // But the zodiac signs rotate with ascDeg.
+            // House i occupies zodiac degrees ascDeg + i*30 to ascDeg + (i+1)*30
+            // We render sectors as before but now they rotate with ascDeg.
+
+            const sA   = zodiacToScreenAngle(ascDeg + i * 30);
+            const eA   = zodiacToScreenAngle(ascDeg + (i + 1) * 30);
+            const midA = zodiacToScreenAngle(ascDeg + i * 30 + 15);
+
+            // Arc sector (going clockwise in screen = decreasing zodiac)
+            // Since zodiac goes CCW on screen, we need sweep-flag 0 (CCW)
+            const p0 = pt(OUTER_R, sA), p1 = pt(OUTER_R, eA);
+            const p2 = pt(INNER_R, eA), p3 = pt(INNER_R, sA);
+
+            // Use large-arc-flag based on angle difference
+            const angleDiff = 30; // always 30 degrees
+            const la = angleDiff > 180 ? 1 : 0;
+
+            housesG.appendChild(createSVGEl("path", {
+                d: `M${p0.x},${p0.y} A${OUTER_R},${OUTER_R} 0 ${la} 0 ${p1.x},${p1.y}` +
+                   `L${p2.x},${p2.y} A${INNER_R},${INNER_R} 0 ${la} 1 ${p3.x},${p3.y}Z`,
+                class: i % 2 === 0 ? "house-sector" : "house-sector-alt"
+            }));
+
+            housesG.appendChild(createSVGEl("line", {
+                x1: pt(INNER_R, sA).x, y1: pt(INNER_R, sA).y,
+                x2: pt(OUTER_R, sA).x, y2: pt(OUTER_R, sA).y,
+                class: "tick-major"
+            }));
+
+            // House numbers (rotate with ASC)
+            addSVGText(i + 1, INNER_R + 18, midA, "house-num", housesG);
+
+            // Zodiac signs: sign i occupies degrees i*30 to (i+1)*30 in zodiac space
+            // The sign symbol appears at the midpoint of the visible sector for sign i
+            const signMidZodiac = i * 30 + 15;
+            const signMidA = zodiacToScreenAngle(signMidZodiac);
+            const zx = pt(OUTER_R + 22, signMidA).x;
+            const zy = pt(OUTER_R + 22, signMidA).y;
+            const zTxt = createSVGEl("text", {
+                x: zx, y: zy, class: "zodiac-text",
+                "text-anchor": "middle", "dominant-baseline": "middle"
+            });
+            zTxt.textContent = ZODIAC_SYM[i];
+            zTxt.addEventListener("mouseenter", (e) => showTip(ZODIAC_NAMES[i], e.clientX, e.clientY));
+            zTxt.addEventListener("mousemove",  (e) => positionTip(e.clientX, e.clientY));
+            zTxt.addEventListener("mouseleave", () => hideTip(80));
+            zodiacG.appendChild(zTxt);
+        }
+    }
+
+    function renderAxes() {
+        const axesG = document.getElementById("axes-layer");
+        axesG.innerHTML = "";
+
+        // ASC–DC axis (left–right horizon)
+        const ascAngle = zodiacToScreenAngle(ascDeg);
+        const dcAngle  = zodiacToScreenAngle(mod360(ascDeg + 180));
+        const mcAngle  = zodiacToScreenAngle(mod360(ascDeg + 90));  
+        const icAngle  = zodiacToScreenAngle(mod360(ascDeg + 270));
+
+        // ASC-DC line
+        const ascPt = pt(OUTER_R + 2, ascAngle);
+        const dcPt  = pt(OUTER_R + 2, dcAngle);
+        axesG.appendChild(createSVGEl("line", {
+            x1: ascPt.x, y1: ascPt.y, x2: dcPt.x, y2: dcPt.y,
+            class: "asc-axis-line"
+        }));
+
+        // MC-IC line
+        const mcPt = pt(OUTER_R + 2, mcAngle);
+        const icPt = pt(OUTER_R + 2, icAngle);
+        axesG.appendChild(createSVGEl("line", {
+            x1: mcPt.x, y1: mcPt.y, x2: icPt.x, y2: icPt.y,
+            class: "mc-axis-line"
+        }));
+
+        // Label offset radius
+        const LR = OUTER_R + 36;
+
+        // ASC label
+        const ascLbl = createSVGEl("text", { x: pt(LR, ascAngle).x, y: pt(LR, ascAngle).y, class: "asc-label-text", "text-anchor": "middle", "dominant-baseline": "middle" });
+        ascLbl.textContent = "ASC";
+        axesG.appendChild(ascLbl);
+
+        // DC label
+        const dcLbl = createSVGEl("text", { x: pt(LR, dcAngle).x, y: pt(LR, dcAngle).y, class: "dc-label-text", "text-anchor": "middle", "dominant-baseline": "middle" });
+        dcLbl.textContent = "DC";
+        axesG.appendChild(dcLbl);
+
+        // MC label
+        const mcLbl = createSVGEl("text", { x: pt(LR, mcAngle).x, y: pt(LR, mcAngle).y, class: "mc-label-text", "text-anchor": "middle", "dominant-baseline": "middle" });
+        mcLbl.textContent = "MC";
+        axesG.appendChild(mcLbl);
+
+        // IC label
+        const icLbl = createSVGEl("text", { x: pt(LR, icAngle).x, y: pt(LR, icAngle).y, class: "ic-label-text", "text-anchor": "middle", "dominant-baseline": "middle" });
+        icLbl.textContent = "IC";
+        axesG.appendChild(icLbl);
+    }
+
+    function renderAscHandle() {
+        const handleG = document.getElementById("asc-handle-layer");
+        handleG.innerHTML = "";
+
+        const ascAngle = zodiacToScreenAngle(ascDeg);
+        const handlePos = pt(OUTER_R + 4, ascAngle);
+        const isAscDragging = gesture.mode === "drag-asc";
+
+        const g = createSVGEl("g", { class: "asc-handle", "data-asc-handle": "1" });
+
+        // Glow circle
+        const circle = createSVGEl("circle", {
+            cx: handlePos.x, cy: handlePos.y, r: isAscDragging ? 16 : 11,
+            class: "asc-handle-circle" + (isAscDragging ? " dragging" : ""),
+            "stroke": "var(--asc-color)", "stroke-width": isAscDragging ? 2 : 1.5,
+        });
+        g.appendChild(circle);
+
+        // Diamond marker
+        const diamond = createSVGEl("polygon", {
+            points: buildDiamond(handlePos.x, handlePos.y, 6),
+            fill: "var(--asc-color)", opacity: isAscDragging ? "1" : "0.85",
+        });
+        g.appendChild(diamond);
+
+        handleG.appendChild(g);
+    }
+
+    function buildDiamond(cx, cy, r) {
+        return `${cx},${cy - r} ${cx + r * 0.6},${cy} ${cx},${cy + r} ${cx - r * 0.6},${cy}`;
+    }
+
+    // ── Stacking ───────────────────────────────────────────────────────────────
+    function computeStackedPositions() {
+        const STACK_THRESHOLD = 5;
+        const entries = [];
+        chartState.forEach((data, id) => entries.push({ id, totalDeg: data.totalDeg }));
+        entries.sort((a, b) => a.totalDeg - b.totalDeg);
+
+        const result = new Map();
+        const clusters = [];
+        let current = [];
+        for (let i = 0; i < entries.length; i++) {
+            if (current.length === 0) {
+                current.push(entries[i]);
+            } else {
+                let diff = Math.abs(entries[i].totalDeg - current[current.length - 1].totalDeg);
+                if (diff > 180) diff = 360 - diff;
+                if (diff <= STACK_THRESHOLD) current.push(entries[i]);
+                else { clusters.push(current); current = [entries[i]]; }
+            }
+        }
+        if (current.length) clusters.push(current);
+
+        if (clusters.length >= 2) {
+            const first = clusters[0][0].totalDeg;
+            const last  = clusters[clusters.length - 1];
+            let diff = Math.abs(first + 360 - last[last.length - 1].totalDeg);
+            if (diff > 180) diff = 360 - diff;
+            if (diff <= STACK_THRESHOLD) {
+                clusters[0] = [...last, ...clusters[0]];
+                clusters.pop();
+            }
+        }
+        clusters.forEach(cluster => cluster.forEach((entry, idx) => result.set(entry.id, idx)));
+        return result;
+    }
+
+    function renderPlanets() {
+        const layer = document.getElementById("planets-layer");
+        layer.innerHTML = "";
+
+        document.querySelectorAll(".planet-btn").forEach(btn => {
+            const placed = chartState.has(btn.dataset.id);
+            btn.classList.toggle("placed", placed);
+            btn.classList.toggle("dragging",
+                gesture.mode === "drag-from-bank" && gesture.planetId === btn.dataset.id);
+        });
+
+        const stackMap = computeStackedPositions();
+
+        chartState.forEach((data, id) => {
+            const zodiacDeg = data.totalDeg;
+            const stackIdx  = stackMap.get(id) || 0;
+            const isScrubbing = gesture.mode === "scrub" && gesture.planetId === id;
+
+            const radius      = MID_R + stackIdx * 22;
+            const labelRadius = Math.min(radius + 18, OUTER_R - 8);
+            const angle       = zodiacToScreenAngle(zodiacDeg);
+            const pos         = pt(radius, angle);
+            const lblPos      = pt(labelRadius, angle);
+
+            const g = document.createElementNS(svgNS, "g");
+            g.setAttribute("data-planet-id", id);
+
+            const dTxt = createSVGEl("text", { x: lblPos.x, y: lblPos.y, class: "degree-label" });
+            dTxt.textContent = `${Math.floor(getZodiacDeg(zodiacDeg))}°`;
+
+            const planetClass = `chart-planet c-${id}${isScrubbing ? " scrubbing" : ""}`;
+            const pTxt = createSVGEl("text", { x: pos.x, y: pos.y, class: planetClass });
+            pTxt.textContent = SYMBOLS[id];
+
+            const makeTipText = () => {
+                const zSign = getZodiacHouse(data.totalDeg);
+                return `${PLANET_NAMES[id]}  ·  ${ZODIAC_NAMES[zSign]}  ${Math.floor(getZodiacDeg(data.totalDeg))}°`;
+            };
+
+            pTxt.addEventListener("mouseenter", (e) => showTip(makeTipText(), e.clientX, e.clientY));
+            pTxt.addEventListener("mousemove",  (e) => positionTip(e.clientX, e.clientY));
+            pTxt.addEventListener("mouseleave", () => hideTip(80));
+
+            pTxt.addEventListener("dblclick", () => {
+                hideTip();
+                chartState.delete(id);
+                render();
+            });
+
+            pTxt.addEventListener("mousedown", (e) => {
+                e.preventDefault();
+                hideTip();
+                startMouseScrub(id, data, e.clientX, e.clientY);
+            });
+
+            g.appendChild(dTxt);
+            g.appendChild(pTxt);
+            layer.appendChild(g);
+        });
+    }
+
+    // ── Lightweight partial planet update ──────────────────────────────────────
+    function updateScrubbingPlanet(id) {
+        const layer = document.getElementById("planets-layer");
+        const g = layer.querySelector(`[data-planet-id="${id}"]`);
+        if (!g) { render(); return; }
+
+        const data      = chartState.get(id);
+        const stackMap  = computeStackedPositions();
+        const stackIdx  = stackMap.get(id) || 0;
+        const zodiacDeg = data.totalDeg;
+        const radius    = MID_R + stackIdx * 22;
+        const labelRadius = Math.min(radius + 18, OUTER_R - 8);
+        const angle     = zodiacToScreenAngle(zodiacDeg);
+        const pos       = pt(radius, angle);
+        const lblPos    = pt(labelRadius, angle);
+
+        const pTxt = g.querySelector(".chart-planet");
+        const dTxt = g.querySelector(".degree-label");
+        if (pTxt) { pTxt.setAttribute("x", pos.x); pTxt.setAttribute("y", pos.y); }
+        if (dTxt) { dTxt.setAttribute("x", lblPos.x); dTxt.setAttribute("y", lblPos.y); dTxt.textContent = `${Math.floor(getZodiacDeg(zodiacDeg))}°`; }
+    }
+
+    // ── Mouse scrub for planets ────────────────────────────────────────────────
+    function getScreenAngleFromCenter(clientX, clientY) {
+        const rect   = dropzone.getBoundingClientRect();
+        const scaleX = VIEWBOX_SIZE / rect.width;
+        const scaleY = VIEWBOX_SIZE / rect.height;
+        const vbX    = (clientX - rect.left) * scaleX;
+        const vbY    = (clientY - rect.top)  * scaleY;
+        return Math.atan2(vbY - CENTER, vbX - CENTER) * 180 / Math.PI;
+    }
+
+    // Convert screen angle delta to zodiac delta (opposite direction)
+    function screenAngleDeltaToZodiacDelta(screenDelta) {
+        return -screenDelta; // zodiac goes CCW on screen
+    }
+
+    function startMouseScrub(id, data, startX, startY) {
+        const startScreenAngle = getScreenAngleFromCenter(startX, startY);
+        const startTotal = data.totalDeg;
+
+        document.body.style.cursor = "ew-resize";
+
+        showTip(`${PLANET_NAMES[id]}  ·  ${ZODIAC_NAMES[getZodiacHouse(data.totalDeg)]}  ${Math.floor(getZodiacDeg(data.totalDeg))}°`, startX, startY);
+
+        const onMove = (e) => {
+            e.preventDefault();
+            const currentScreenAngle = getScreenAngleFromCenter(e.clientX, e.clientY);
+            let screenDelta = currentScreenAngle - startScreenAngle;
+            if (screenDelta > 180) screenDelta -= 360;
+            if (screenDelta < -180) screenDelta += 360;
+            const zodiacDelta = screenAngleDeltaToZodiacDelta(screenDelta);
+            data.totalDeg = mod360(startTotal + zodiacDelta);
+            updateTipText(`${PLANET_NAMES[id]}  ·  ${ZODIAC_NAMES[getZodiacHouse(data.totalDeg)]}  ${Math.floor(getZodiacDeg(data.totalDeg))}°`);
+            positionTip(e.clientX, e.clientY);
+            if (!tipEl.classList.contains("visible")) tipEl.classList.add("visible");
+            updateScrubbingPlanet(id);
+        };
+
+        const onUp = () => {
+            window.removeEventListener("mousemove", onMove);
+            window.removeEventListener("mouseup",   onUp);
+            document.body.style.cursor = "";
+            hideTip(1200);
+            render();
+        };
+        window.addEventListener("mousemove", onMove, { passive: false });
+        window.addEventListener("mouseup",   onUp);
+    }
+
+    // ── Mouse drag for ASC handle ──────────────────────────────────────────────
+    function startMouseDragAsc(startX, startY) {
+        const startScreenAngle = getScreenAngleFromCenter(startX, startY);
+        const startAsc = ascDeg;
+
+        document.body.style.cursor = "grabbing";
+        dropzone.classList.add("asc-drag-active");
+        showAscBadge(ascDeg);
+
+        const onMove = (e) => {
+            e.preventDefault();
+            const currentScreenAngle = getScreenAngleFromCenter(e.clientX, e.clientY);
+            let screenDelta = currentScreenAngle - startScreenAngle;
+            if (screenDelta > 180) screenDelta -= 360;
+            if (screenDelta < -180) screenDelta += 360;
+            // Moving clockwise on screen = ASC moves forward in zodiac (CCW zodiac direction)
+            ascDeg = mod360(startAsc - screenDelta);
+            showAscBadge(ascDeg);
+            render();
+        };
+
+        const onUp = () => {
+            window.removeEventListener("mousemove", onMove);
+            window.removeEventListener("mouseup",   onUp);
+            document.body.style.cursor = "";
+            dropzone.classList.remove("asc-drag-active");
+            setTimeout(hideAscBadge, 1800);
+            render();
+        };
+        window.addEventListener("mousemove", onMove, { passive: false });
+        window.addEventListener("mouseup",   onUp);
+    }
+
+    // ── Mouse down on chart (detect ASC handle or planet) ─────────────────────
+    document.getElementById("asc-handle-layer").addEventListener("mousedown", (e) => {
+        if (e.target.closest("[data-asc-handle]")) {
+            e.preventDefault();
+            startMouseDragAsc(e.clientX, e.clientY);
+        }
+    });
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  UNIFIED TOUCH SYSTEM
+    // ═══════════════════════════════════════════════════════════════════════════
+    let activeTouchId = null;
+
+    document.addEventListener("touchstart",  onTouchStart,  { passive: false });
+    document.addEventListener("touchmove",   onTouchMove,   { passive: false });
+    document.addEventListener("touchend",    onTouchEnd,    { passive: false });
+    document.addEventListener("touchcancel", onTouchEnd,    { passive: false });
+
+    function getTouchById(list, id) {
+        for (let i = 0; i < list.length; i++) if (list[i].identifier === id) return list[i];
+        return null;
+    }
+
+    function onTouchStart(e) {
+        if (gesture.mode !== null) return;
+        if (e.changedTouches.length === 0) return;
+
+        const touch  = e.changedTouches[0];
+        const target = touch.target;
+
+        // ── Case 0: Touching ASC handle ────────────────────────────────────────
+        if (isNearAscHandle(touch.clientX, touch.clientY)) {
+            e.preventDefault();
+            activeTouchId = touch.identifier;
+            gesture.mode  = "drag-asc";
+            gesture.startX = touch.clientX;
+            gesture.startY = touch.clientY;
+            gesture.startAscDeg = ascDeg;
+            gesture.startAngle  = getScreenAngleFromCenter(touch.clientX, touch.clientY);
+            gesture.moved = false;
+            gesture.movePixels = 0;
+            dropzone.classList.add("asc-drag-active");
+            showAscBadge(ascDeg);
+            render();
+            return;
+        }
+
+        // ── Case 1: Touching a bank button ──────────────────────────────────────
+        const btn = target.closest(".planet-btn");
+        if (btn && !btn.classList.contains("placed")) {
+            e.preventDefault();
+            activeTouchId     = touch.identifier;
+            gesture.mode      = "drag-from-bank";
+            gesture.planetId  = btn.dataset.id;
+            gesture.startX    = touch.clientX;
+            gesture.startY    = touch.clientY;
+            gesture.moved     = false;
+            gesture.movePixels = 0;
+            ghost.textContent   = SYMBOLS[gesture.planetId];
+            ghost.style.left    = touch.clientX + "px";
+            ghost.style.top     = touch.clientY + "px";
+            ghost.style.display = "block";
+            render();
+            return;
+        }
+
+        // ── Case 2: Touching a placed planet ────────────────────────────────────
+        let el = target;
+        let planetId = null;
+        while (el && el !== document.body) {
+            if (el.classList && el.classList.contains("chart-planet")) {
+                for (const cls of el.classList) {
+                    if (cls.startsWith("c-") && cls !== "chart-planet") { planetId = cls.slice(2); break; }
+                }
+                break;
+            }
+            el = el.parentElement;
+        }
+
+        if (planetId && chartState.has(planetId)) {
+            e.preventDefault();
+            activeTouchId     = touch.identifier;
+            gesture.mode      = "scrub";
+            gesture.planetId  = planetId;
+            gesture.startX    = touch.clientX;
+            gesture.startY    = touch.clientY;
+            gesture.startTotalDeg = chartState.get(planetId).totalDeg;
+            gesture.startAngle    = getScreenAngleFromCenter(touch.clientX, touch.clientY);
+            gesture.moved         = false;
+            gesture.movePixels    = 0;
+            render();
+            const data = chartState.get(planetId);
+            showTip(`${PLANET_NAMES[planetId]}  ·  ${ZODIAC_NAMES[getZodiacHouse(data.totalDeg)]}  ${Math.floor(getZodiacDeg(data.totalDeg))}°`, touch.clientX, touch.clientY);
+        }
+    }
+
+    function onTouchMove(e) {
+        if (gesture.mode === null) return;
+        const touch = getTouchById(e.changedTouches, activeTouchId) || getTouchById(e.touches, activeTouchId);
+        if (!touch) return;
+        e.preventDefault();
+
+        const cx = touch.clientX, cy = touch.clientY;
+        gesture.movePixels = Math.sqrt((cx - gesture.startX) ** 2 + (cy - gesture.startY) ** 2);
+        if (gesture.movePixels > 5) gesture.moved = true;
+
+        if (gesture.mode === "drag-from-bank") {
+            ghost.style.left = cx + "px";
+            ghost.style.top  = cy + "px";
+            dropzone.classList.toggle("drag-over", isOverDropzoneCircle(cx, cy));
+
+        } else if (gesture.mode === "scrub") {
+            const data = chartState.get(gesture.planetId);
+            if (data) {
+                const currentScreenAngle = getScreenAngleFromCenter(cx, cy);
+                let screenDelta = currentScreenAngle - gesture.startAngle;
+                if (screenDelta > 180) screenDelta -= 360;
+                if (screenDelta < -180) screenDelta += 360;
+                data.totalDeg = mod360(gesture.startTotalDeg - screenDelta);
+                updateTipText(`${PLANET_NAMES[gesture.planetId]}  ·  ${ZODIAC_NAMES[getZodiacHouse(data.totalDeg)]}  ${Math.floor(getZodiacDeg(data.totalDeg))}°`);
+                positionTip(cx, cy);
+                if (!tipEl.classList.contains("visible")) tipEl.classList.add("visible");
+                updateScrubbingPlanet(gesture.planetId);
+            }
+
+        } else if (gesture.mode === "drag-asc") {
+            const currentScreenAngle = getScreenAngleFromCenter(cx, cy);
+            let screenDelta = currentScreenAngle - gesture.startAngle;
+            if (screenDelta > 180) screenDelta -= 360;
+            if (screenDelta < -180) screenDelta += 360;
+            ascDeg = mod360(gesture.startAscDeg - screenDelta);
+            showAscBadge(ascDeg);
+            render();
+        }
+    }
+
+    function onTouchEnd(e) {
+        if (gesture.mode === null) return;
+        const touch = getTouchById(e.changedTouches, activeTouchId);
+        if (!touch) return;
+        e.preventDefault();
+
+        const cx = touch.clientX, cy = touch.clientY;
+
+        if (gesture.mode === "drag-from-bank") {
+            ghost.style.display = "none";
+            dropzone.classList.remove("drag-over");
+            if (isInRing(cx, cy)) {
+                const zodiacDeg = clientToZodiacDeg(cx, cy);
+                chartState.set(gesture.planetId, { totalDeg: resolveUniqueTotal(zodiacDeg, gesture.planetId) });
+            }
+
+        } else if (gesture.mode === "scrub") {
+            hideTip(1200);
+            if (gesture.movePixels < 6) {
+                const now  = Date.now();
+                const last = tapTimestamps.get(gesture.planetId) || 0;
+                if (now - last < 350) { chartState.delete(gesture.planetId); hideTip(0); }
+                tapTimestamps.set(gesture.planetId, now);
+            }
+
+        } else if (gesture.mode === "drag-asc") {
+            dropzone.classList.remove("asc-drag-active");
+            setTimeout(hideAscBadge, 1800);
+        }
+
+        gesture.mode = null; gesture.planetId = null; gesture.moved = false;
+        gesture.movePixels = 0; activeTouchId = null;
+        render();
+    }
+
+    const tapTimestamps = new Map();
+
+    function resolveUniqueTotal(totalDeg, excludeId) {
+        let resolved = totalDeg;
+        chartState.forEach((data, id) => {
+            if (id === excludeId) return;
+            if (Math.abs(data.totalDeg - resolved) < 0.1) resolved += 0.2;
+        });
+        return mod360(resolved);
+    }
+
+    // ── Desktop Drag & Drop ───────────────────────────────────────────────────
+    document.querySelectorAll(".planet-btn").forEach(btn => {
+        btn.setAttribute("draggable", "true");
+        btn.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("text/plain", btn.dataset.id);
+            e.dataTransfer.effectAllowed = "copy";
+        });
+    });
+
+    dropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        if (isOverDropzoneCircle(e.clientX, e.clientY)) dropzone.classList.add("drag-over");
+        else dropzone.classList.remove("drag-over");
+    });
+    dropzone.addEventListener("dragleave", () => dropzone.classList.remove("drag-over"));
+    dropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropzone.classList.remove("drag-over");
+        const id = e.dataTransfer.getData("text/plain");
+        if (!id) return;
+        if (isInRing(e.clientX, e.clientY)) {
+            const zodiacDeg = clientToZodiacDeg(e.clientX, e.clientY);
+            chartState.set(id, { totalDeg: resolveUniqueTotal(zodiacDeg, id) });
+        }
+        render();
+    });
+
+    document.addEventListener("selectstart", (e) => {
+        if (gesture.mode === "scrub" || gesture.mode === "drag-asc") e.preventDefault();
+    });
+
+    let resizeTimer = null;
+    window.addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(render, 100);
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+        chartState.clear();
+        render();
+    });
+
+    // ── Boot ──────────────────────────────────────────────────────────────────
+    init();
+    render();
+})();
+</script>
+</body>
+</html>

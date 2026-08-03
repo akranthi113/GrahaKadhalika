@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VedicChart Pro | Dynamic Stacking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --accent: #8b5cf6;
+            --bg-body: #e2e8f0; 
+            --card-bg: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --shadow-out: 6px 6px 12px #cbd5e1, -6px -6px 12px #ffffff;
+            --shadow-inset: inset 2px 2px 5px #cbd5e1, inset -2px -2px 5px #ffffff;
+            --shadow-btn: 4px 4px 8px #cbd5e1, -4px -4px 8px #ffffff;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px; 
+            display: flex; 
+            flex-direction: column;
+            padding: 8px;
+            gap: 12px;
+        }
+
+        .header h1 {
+            text-align: center; font-weight: 800; font-size: 1.2rem; margin: 4px 0;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .chart-wrapper {
+            background: var(--card-bg);
+            border-radius: 20px; 
+            padding: 4px;
+            box-shadow: var(--shadow-out);
+            border: 1px solid rgba(255,255,255,0.6);
+            width: 100%;
+            touch-action: none;
+        }
+
+        svg { 
+            width: 100%; 
+            height: auto; 
+            display: block; 
+            overflow: visible;
+            touch-action: none; 
+        }
+
+        .house { 
+            fill: #fcfdfe; stroke: #d1d5db; stroke-width: 1.2; 
+            transition: fill 0.2s; pointer-events: all;
+        }
+        
+        .house.drag-over { fill: #e0e7ff; stroke: var(--primary); stroke-width: 2.5; }
+
+        .zodiac-num { fill: #94a3b8; font-size: 20px; font-weight: 900; opacity: 0.5; pointer-events: none; }
+        .sign-label { fill: var(--primary); font-size: 12px; font-weight: 800; pointer-events: none; }
+        
+        .planet-tag { 
+            font-weight: 800; cursor: move; 
+            paint-order: stroke; stroke: #ffffff; stroke-width: 4px;
+            transition: transform 0.1s ease;
+        }
+
+        .control-panel {
+            background: #f1f5f9;
+            border-radius: 20px; 
+            padding: 16px;
+            box-shadow: var(--shadow-inset);
+            display: flex; 
+            flex-direction: column; 
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .bank-label { font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        #planet-bank { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+
+        .planet-item {
+            width: 40px; height: 40px; 
+            display: flex; align-items: center; justify-content: center;
+            background: var(--card-bg); 
+            border-radius: 10px; font-weight: 800; font-size: 0.85rem;
+            box-shadow: var(--shadow-btn);
+            cursor: move;
+        }
+        
+        .planet-item.in-use { opacity: 0.2; box-shadow: none; border: 1px dashed #cbd5e1; pointer-events: none; }
+
+        select {
+            width: 100%; padding: 12px; border-radius: 12px;
+            border: none; background: var(--card-bg);
+            box-shadow: var(--shadow-btn);
+            font-family: inherit; font-weight: 700; font-size: 0.9rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236366f1'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;
+        }
+
+        .btn-reset {
+            width: 100%; padding: 14px; border: none; border-radius: 12px;
+            background: #1e293b; color: white; font-weight: 700;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            cursor: pointer;
+        }
+
+        #drag-proxy {
+            position: fixed; pointer-events: none; z-index: 9999;
+            color: white; padding: 12px 20px; border-radius: 14px;
+            font-weight: 800; font-size: 1.4rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none; transform: translate(-50%, -130%);
+        }
+    </style>
+</head>
+<body>
+<a href="../charts" style="position:fixed;top:12px;left:12px;z-index:99999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;font:600 14px/1.2 system-ui,-apple-system,'Segoe UI',sans-serif;color:#fff;background:rgba(30,30,46,0.88);border:1px solid rgba(99,102,241,0.8);border-radius:8px;text-decoration:none;backdrop-filter:blur(4px);box-shadow:0 2px 12px rgba(0,0,0,0.45)">&#8592; Back to Charts</a>
+
+<div class="app-container">
+    <header class="header"><h1>VedicChart Pro</h1></header>
+
+    <main class="chart-wrapper">
+        <svg id="chart" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet">
+            <g id="houses-group"></g>
+            <g id="labels-group"></g>
+            <g id="planets-group"></g>
+        </svg>
+    </main>
+
+    <section class="control-panel">
+        <div>
+            <div class="bank-label">Planet Reservoir</div>
+            <div id="planet-bank"></div>
+        </div>
+
+        <div class="form-row">
+            <div class="bank-label">Lagna Sign</div>
+            <select id="asc-select" onchange="updateAscendant(this.value)"></select>
+        </div>
+
+        <button class="btn-reset" onclick="resetChart()">Clear Workspace</button>
+    </section>
+</div>
+
+<div id="drag-proxy"></div>
+
+<script>
+const SIGN_NAMES = ["Ar", "Ta", "Ge", "Cn", "Le", "Vi", "Li", "Sc", "Sg", "Cp", "Aq", "Pi"];
+const PLANETS = [
+    {full:"Sun", short:"Su", color:"#f59e0b"}, {full:"Moon", short:"Mo", color:"#475569"}, 
+    {full:"Mars", short:"Ma", color:"#ef4444"}, {full:"Mercury", short:"Me", color:"#10b981"}, 
+    {full:"Jupiter", short:"Ju", color:"#d97706"}, {full:"Venus", short:"Ve", color:"#db2777"},
+    {full:"Saturn", short:"Sa", color:"#1e293b"}, {full:"Rahu", short:"Ra", color:"#64748b"}, 
+    {full:"Ketu", short:"Ke", color:"#64748b"}, {full:"Lagna", short:"La", color:"#6366f1"}
+];
+
+const HOUSE_PATHS = [
+    { id:1, p:"250,250 125,125 250,0 375,125", c:[250,125], z:[250,35]},
+    { id:2, p:"125,125 250,0 0,0", c:[125,65], z:[45,25]},
+    { id:3, p:"125,125 0,250 0,0", c:[65,125], z:[25,45]},
+    { id:4, p:"250,250 125,125 0,250 125,375", c:[125,250], z:[35,250]},
+    { id:5, p:"125,375 0,250 0,500", c:[65,375], z:[25,455]},
+    { id:6, p:"125,375 250,500 0,500", c:[125,435], z:[45,475]},
+    { id:7, p:"250,250 125,375 250,500 375,375", c:[250,375], z:[250,465]},
+    { id:8, p:"375,375 250,500 500,500", c:[375,435], z:[455,475]},
+    { id:9, p:"375,375 500,250 500,500", c:[435,375], z:[475,455]},
+    { id:10, p:"250,250 375,125 500,250 375,375", c:[375,250], z:[465,250]},
+    { id:11, p:"375,125 500,0 500,250", c:[435,125], z:[475,45]},
+    { id:12, p:"375,125 250,0 500,0", c:[375,65], z:[455,25]}
+];
+
+let state = { placements: {"Lagna": 1}, ascSignIndex: 0 };
+let draggedPlanet = null;
+
+function init() {
+    renderSignOptions();
+    renderPlanetBank();
+    renderHouses();
+    renderChart();
+}
+
+function renderSignOptions() {
+    const select = document.getElementById('asc-select');
+    select.innerHTML = SIGN_NAMES.map((name, i) => 
+        `<option value="${i}" ${state.ascSignIndex === i ? 'selected' : ''}>Sign ${i+1} (${name})</option>`
+    ).join('');
+}
+
+function updateAscendant(index) {
+    state.ascSignIndex = parseInt(index);
+    sync();
+}
+
+function renderPlanetBank() {
+    const container = document.getElementById('planet-bank');
+    container.innerHTML = '';
+    PLANETS.forEach(p => {
+        const inUse = state.placements[p.full] !== undefined;
+        const div = document.createElement('div');
+        div.className = `planet-item ${inUse?'in-use':''}`;
+        div.style.color = p.color;
+        div.textContent = p.short;
+        if(!inUse) {
+            div.onmousedown = (e) => startDrag(e, p.full, p.short, p.color);
+            div.ontouchstart = (e) => startDrag(e, p.full, p.short, p.color);
+        }
+        container.appendChild(div);
+    });
+}
+
+function renderHouses() {
+    const group = document.getElementById('houses-group');
+    group.innerHTML = HOUSE_PATHS.map(h => `
+        <polygon data-house="${h.id}" points="${h.p}" class="house"></polygon>`).join('');
+}
+
+function renderChart() {
+    const labelGroup = document.getElementById('labels-group');
+    const planetGroup = document.getElementById('planets-group');
+    labelGroup.innerHTML = ''; planetGroup.innerHTML = '';
+    const lagnaHouse = state.placements["Lagna"] || 1;
+
+    HOUSE_PATHS.forEach(h => {
+        let houseNum = ((h.id - lagnaHouse + 12) % 12) + 1;
+        let zodiacNum = ((state.ascSignIndex + houseNum - 1) % 12) + 1;
+        let signName = SIGN_NAMES[zodiacNum - 1];
+        
+        labelGroup.appendChild(createText(h.z[0], h.z[1], zodiacNum, 'zodiac-num'));
+        labelGroup.appendChild(createText(h.c[0], h.c[1] - 48, signName, 'sign-label'));
+
+        const placedNames = Object.keys(state.placements).filter(p => state.placements[p] === h.id);
+        
+        if (placedNames.length > 0) {
+            // DYNAMIC STACKING LOGIC
+            const count = placedNames.length;
+            const useTwoColumns = count > 5;
+            const fontSize = useTwoColumns ? 15 : 18;
+            const rowSpacing = useTwoColumns ? 22 : 26;
+            const colSpacing = 30;
+
+            placedNames.forEach((name, i) => {
+                const pData = PLANETS.find(x => x.full === name);
+                let xPos = h.c[0];
+                let yPos = h.c[1];
+
+                if (useTwoColumns) {
+                    const col = i % 2 === 0 ? -1 : 1;
+                    const row = Math.floor(i / 2);
+                    const totalRows = Math.ceil(count / 2);
+                    xPos = h.c[0] + (col * (colSpacing / 2));
+                    const startY = h.c[1] - ((totalRows - 1) * rowSpacing) / 2;
+                    yPos = startY + (row * rowSpacing) + 4;
+                } else {
+                    const totalHeight = (count - 1) * rowSpacing;
+                    const startY = h.c[1] - (totalHeight / 2);
+                    yPos = startY + (i * rowSpacing) + 4;
+                }
+
+                const node = createText(xPos, yPos, pData.short, 'planet-tag');
+                node.setAttribute('fill', pData.color);
+                node.style.fontSize = fontSize + "px";
+                node.onmousedown = (e) => startDrag(e, name, pData.short, pData.color);
+                node.ontouchstart = (e) => startDrag(e, name, pData.short, pData.color);
+                node.onclick = (e) => { e.stopPropagation(); removePlanet(name); };
+                planetGroup.appendChild(node);
+            });
+        }
+    });
+}
+
+function startDrag(e, planetFull, planetShort, planetColor) {
+    if(e.cancelable) e.preventDefault();
+    draggedPlanet = planetFull;
+    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+    
+    const proxy = document.getElementById('drag-proxy');
+    proxy.textContent = planetShort;
+    proxy.style.backgroundColor = planetColor;
+    proxy.style.display = 'block';
+    updateProxyPos(clientX, clientY);
+
+    const onMove = (me) => {
+        const x = me.type.includes('touch') ? me.touches[0].clientX : me.clientX;
+        const y = me.type.includes('touch') ? me.touches[0].clientY : me.clientY;
+        updateProxyPos(x, y);
+        
+        document.querySelectorAll('.house').forEach(h => h.classList.remove('drag-over'));
+        const target = document.elementFromPoint(x, y);
+        if(target && target.dataset.house) target.classList.add('drag-over');
+    };
+
+    const onEnd = (ee) => {
+        proxy.style.display = 'none';
+        const x = ee.type.includes('touch') ? ee.changedTouches[0].clientX : ee.clientX;
+        const y = ee.type.includes('touch') ? ee.changedTouches[0].clientY : ee.clientY;
+        
+        const target = document.elementFromPoint(x, y);
+        if (target && target.dataset.house) {
+            state.placements[draggedPlanet] = parseInt(target.dataset.house);
+        }
+        
+        document.querySelectorAll('.house').forEach(h => h.classList.remove('drag-over'));
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onEnd);
+        window.removeEventListener('touchmove', onMove);
+        window.removeEventListener('touchend', onEnd);
+        sync();
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onEnd);
+    window.addEventListener('touchmove', onMove, {passive: false});
+    window.addEventListener('touchend', onEnd);
+}
+
+function updateProxyPos(x, y) {
+    const proxy = document.getElementById('drag-proxy');
+    proxy.style.left = x + 'px';
+    proxy.style.top = y + 'px';
+}
+
+function removePlanet(p) {
+    if (p === "Lagna") return; 
+    delete state.placements[p];
+    sync();
+}
+
+function resetChart() {
+    state.placements = {"Lagna": 1};
+    state.ascSignIndex = 0;
+    document.getElementById('asc-select').value = 0;
+    sync();
+}
+
+function sync() { renderPlanetBank(); renderChart(); }
+
+function createText(x, y, t, cls) {
+    const node = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    node.setAttribute("x", x); node.setAttribute("y", y);
+    node.setAttribute("class", cls); node.setAttribute("text-anchor", "middle");
+    node.setAttribute("dominant-baseline", "middle");
+    node.textContent = t;
+    return node;
+}
+
+init();
+</script>
+</body>
+</html>
