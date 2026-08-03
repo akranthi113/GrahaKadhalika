@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import emailjs from '@emailjs/browser'
 import { supabase } from '../utils/supabaseClient'
 import { geocodePlace, searchPlaces } from '../utils/geocoding'
@@ -191,7 +192,7 @@ export default function ContactForm() {
     <main className="contact-page">
       <div className="contact-container">
         <nav className="contact-breadcrumb" aria-label="Breadcrumb">
-          <a href="#/">← Back to Home</a>
+          <Link to="/" className="contact-breadcrumb-link">← Back to Home</Link>
         </nav>
 
         <header className="contact-header">
