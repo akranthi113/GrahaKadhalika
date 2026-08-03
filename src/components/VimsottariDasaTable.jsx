@@ -1,6 +1,5 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { DateTime } from 'luxon'
-import { useScrollableFade } from '../hooks/useScrollableFade'
 import './VimsottariDasaTable.css'
 
 const DASA_SEQUENCE = [
@@ -16,7 +15,7 @@ const DASA_SEQUENCE = [
 ]
 
 const NAKSHATRA_NAMES = [
-  'Ashwini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira', 'Ardra', 'Punarvasu',
+  'Ashwini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashara', 'Ardra', 'Punarvasu',
   'Pushya', 'Ashlesha', 'Magha', 'Purva Phalguni', 'Uttara Phalguni', 'Hasta',
   'Chitra', 'Swati', 'Vishakha', 'Anuradha', 'Jyestha', 'Mula', 'Purva Ashadha',
   'Uttara Ashadha', 'Shravan', 'Dhanishtha', 'Shatabhisha', 'Purva Bhadrapada',
@@ -33,6 +32,11 @@ function formatDuration(years) {
   const m = Math.floor(rem / 30.4375)
   const d = Math.round(rem - m * 30.4375)
   return `${y}y ${m}m ${d}d`
+}
+
+function formatDate(iso) {
+  if (!iso) return ''
+  return DateTime.fromISO(iso).toFormat('dd-LL-yyyy')
 }
 
 function computeDasaPeriods(chartData) {
@@ -74,6 +78,7 @@ function computeDasaPeriods(chartData) {
         duration: formatDuration(subYears),
         start: subStart ? subStart.toISODate() : '',
         end: subEnd ? subEnd.toISODate() : '',
+        children: [],
       })
     }
 
@@ -84,8 +89,8 @@ function computeDasaPeriods(chartData) {
       duration: formatDuration(years),
       start: startDT ? startDT.toISODate() : '',
       end: endDT ? endDT.toISODate() : '',
-      subs,
       isCurrent: Boolean(startDT && endDT && now >= startDT && now <= endDT),
+      children: subs,
     })
   }
 
@@ -93,114 +98,172 @@ function computeDasaPeriods(chartData) {
     nakIndex,
     nakName: NAKSHATRA_NAMES[nakIndex],
     nakLord: firstAbbr,
-    rows,
+    nodes: rows,
   }
 }
 
-export default function VimsottariDasaTable({ chartData }) {
-  const [selectedIndex, setSelectedIndex] = useState(-1)
-  const mainTableRef = useRef(null)
-  const subTableRef = useRef(null)
-  useScrollableFade(mainTableRef, [chartData, selectedIndex])
-  useScrollableFade(subTableRef, [chartData, selectedIndex])
+function DasaTreeNode({ node, level, path, expanded, selectedPath, onToggle, onSelect }) {
+  const hasChildren = node.children && node.children.length > 0
+  const isExpanded = expanded.has(path)
+  const isSelected = selectedPath === path
 
-  const dasa = computeDasaPeriods(chartData)
-  if (!dasa) return null
+  const handleToggle = (e) => {
+    e.stopPropagation()
+    onToggle(path)
+  }
 
-  const currentIndex = dasa.rows.findIndex((r) => r.isCurrent)
-  const activeIndex = selectedIndex === -1 ? (currentIndex >= 0 ? currentIndex : 0) : selectedIndex
-  const selected = dasa.rows[activeIndex]
+  const handleSelect = () => {
+    onSelect(path, node)
+  }
 
   return (
-    <div className="table-container dasa-table">
-      <h3>Vimsottari Dasa Periods</h3>
+    <div className="dasa-tree-depth">
+      <div
+        className={[
+          'dasa-tree-row',
+          isSelected ? 'dasa-tree-row-selected' : '',
+          node.isCurrent ? 'dasa-tree-row-current' : '',
+        ].filter(Boolean).join(' ')}
+        style={{ marginLeft: level * 24 }}
+        onClick={handleSelect}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            if (isSelected) {
+              handleToggle(e)
+            } else {
+              handleSelect()
+            }
+          }
+        }}
+        aria-expanded={isExpanded}
+        aria-selected={isSelected}
+      >
+        {hasChildren ? (
+        <button
+          type="button"
+          className={`dasa-expand-btn ${isExpanded ? 'dasa-expand-btn-expanded' : ''}`}
+          onClick={handleToggle}
+          aria-label={isExpanded ? `Collapse ${node.id}` : `Expand ${node.id}`}
+        >
+          <span className="dasa-expand-icon" aria-hidden="true">
+            {isExpanded ? '−' : '+'}
+          </span>
+        </button>
+        ) : (
+          <span className="dasa-expand-spacer" aria-hidden="true" />
+        )}
+        <span className="dasa-node-planet">
+          <span className="dasa-lord">{node.abbr}</span> {node.id}
+        </span>
+        <span className="dasa-node-dates" title={`${formatDate(node.start)} to ${formatDate(node.end)}`}>
+          From {formatDate(node.start)} to {formatDate(node.end)}
+        </span>
+        {node.duration ? <span className="dasa-node-duration">({node.duration})</span> : null}
+      </div>
+      {hasChildren && isExpanded && (
+        <div className="dasa-tree-children">
+          {node.children.map((child, j) => {
+            const childPath = `${path}-${j}`
+            return (
+              <DasaTreeNode
+                key={childPath}
+                node={child}
+                level={level + 1}
+                path={childPath}
+                expanded={expanded}
+                selectedPath={selectedPath}
+                onToggle={onToggle}
+                onSelect={onSelect}
+              />
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function DasaDetails({ node }) {
+  return (
+    <div className="dasa-details">
+      <div className="dasa-details-planet">
+        <span className="dasa-lord dasa-details-lord">{node.abbr}</span> {node.id}
+      </div>
+      <p className="dasa-details-dates">From {formatDate(node.start)} to {formatDate(node.end)}</p>
+      {node.duration ? <p className="dasa-details-duration">Duration: {node.duration}</p> : null}
+      {node.years ? <p className="dasa-details-years">Period: {node.years} years</p> : null}
+    </div>
+  )
+}
+
+export default function VimsottariDasaTable({ chartData }) {
+  const dasa = computeDasaPeriods(chartData)
+
+  const [expanded, setExpanded] = useState(() => {
+    const set_ = new Set()
+    if (dasa) {
+      const currentIdx = dasa.nodes.findIndex((n) => n.isCurrent)
+      if (currentIdx >= 0) set_.add(String(currentIdx))
+    }
+    return set_
+  })
+  const [selectedPath, setSelectedPath] = useState(() => {
+    if (!dasa) return ''
+    const currentIdx = dasa.nodes.findIndex((n) => n.isCurrent)
+    return String(currentIdx >= 0 ? currentIdx : 0)
+  })
+  const [selectedNode, setSelectedNode] = useState(() => (dasa ? dasa.nodes[0] : null))
+
+  if (!dasa) return null
+
+  const handleToggle = (path) => {
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      if (next.has(path)) next.delete(path)
+      else next.add(path)
+      return next
+    })
+  }
+
+  const handleSelect = (path, node) => {
+    setSelectedPath(path)
+    setSelectedNode(node)
+  }
+
+  return (
+    <div className="dasa-master-detail">
+      <div className="dasa-header">
+        <span className="dasa-header-title">Vimshottari Dasha</span>
+      </div>
       <p className="dasa-meta">
         Janma Nakshatra: <strong>{dasa.nakName}</strong> (lord {dasa.nakLord})
       </p>
-      <div className="table-scroll" ref={mainTableRef}>
-        <table className="vedic-table dasa-table-inner">
-          <thead>
-            <tr>
-              <th>Planet / Lord</th>
-              <th>Dasa Period</th>
-              <th>Start Date</th>
-              <th>End Date</th>
-              <th>Antardasa</th>
-            </tr>
-          </thead>
-          <tbody>
-            {dasa.rows.map((row, i) => (
-              <tr
-                key={i}
-                onClick={() => setSelectedIndex(i)}
-                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setSelectedIndex(i)}
-                tabIndex={0}
-                role="button"
-                aria-pressed={activeIndex === i}
-                className={[
-                  row.isCurrent ? 'dasa-current' : '',
-                  activeIndex === i ? 'dasa-selected' : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-              >
-                <td data-label="Planet / Lord">
-                  <span className="dasa-lord">{row.abbr}</span> {row.id}
-                </td>
-                <td data-label="Dasa Period">{row.years} yrs</td>
-                <td data-label="Start Date">{row.start}</td>
-                <td data-label="End Date">{row.end}</td>
-                <td data-label="Antardasa" className="dasa-antardasa-cell">
-                  {activeIndex === i ? (
-                    <span className="dasa-active-tag">Showing ▼</span>
-                  ) : (
-                    <span className="dasa-click-hint">
-                      <span className="dasa-hint-click">Click</span>
-                      <span className="dasa-hint-tap">Tap</span> to view
-                    </span>
-                  )}
-                </td>
-              </tr>
+      <div className="dasa-panels">
+        <nav className="dasa-tree-panel" aria-label="Dasha periods">
+          <div className="dasa-tree">
+            {dasa.nodes.map((node, i) => (
+              <DasaTreeNode
+                key={String(i)}
+                node={node}
+                level={0}
+                path={String(i)}
+                expanded={expanded}
+                selectedPath={selectedPath}
+                onToggle={handleToggle}
+                onSelect={handleSelect}
+              />
             ))}
-          </tbody>
-        </table>
-      </div>
-
-      {selected && (
-        <div className="dasa-antardasa">
-          <h4>
-            Antardasa of {selected.abbr} ({selected.id}) · {selected.start} — {selected.end}
-          </h4>
-          <div className="table-scroll" ref={subTableRef}>
-            <table className="vedic-table dasa-sub-table">
-              <thead>
-                <tr>
-                  <th>Planet / Lord</th>
-                  <th>Period</th>
-                  <th>Start Date</th>
-                  <th>End Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {selected.subs.map((sub, j) => (
-                  <tr key={j}>
-                    <td data-label="Planet / Lord">
-                      <span className="dasa-lord">{sub.abbr}</span> {sub.id}
-                    </td>
-                    <td data-label="Period">{sub.years} yrs</td>
-                    <td data-label="Start Date">{sub.start}</td>
-                    <td data-label="End Date">{sub.end}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
-        </div>
-      )}
-
+        </nav>
+        <aside className="dasa-details-panel">
+          <DasaDetails node={selectedNode} />
+        </aside>
+      </div>
       <p className="dasa-note">
-        Dasa periods are calculated from the Moon&apos;s nakshatra at birth. Tap a mahadasha row to
-        view its antardasha breakdown.
+        Expand a mahadasha to reveal its antardasha periods. Select any period to view its details.
       </p>
     </div>
   )
