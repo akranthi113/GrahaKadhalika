@@ -136,6 +136,54 @@
   font-weight: 700;
 }
 
+.contact-requests-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.contact-request-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+
+.contact-request-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.contact-request-header h3 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.1rem;
+}
+
+.contact-request-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.contact-request-meta strong {
+  color: var(--color-text);
+}
+
+.contact-request-issue {
+  color: var(--color-text);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.75rem;
+  white-space: pre-wrap;
+}
+
 @media (max-width: 640px) {
   .blog-header {
     flex-direction: column;

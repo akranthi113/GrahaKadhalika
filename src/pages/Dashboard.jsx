@@ -21,6 +21,8 @@ export default function Dashboard() {
   })
   const [user, setUser] = useState(null)
   const [blogs, setBlogs] = useState([])
+  const [contactRequests, setContactRequests] = useState([])
+  const [contactError, setContactError] = useState('')
   const [loading, setLoading] = useState(true)
   const [deleteError, setDeleteError] = useState('')
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
@@ -43,6 +45,17 @@ export default function Dashboard() {
           .order('created_at', { ascending: false })
 
         setBlogs(blogsData || [])
+
+        const { data: contactData, error: contactErr } = await supabase
+          .from('contact_requests')
+          .select('*')
+          .order('created_at', { ascending: false })
+
+        if (contactErr) {
+          setContactError('Could not load contact requests.')
+        } else {
+          setContactRequests(contactData || [])
+        }
       }
       setLoading(false)
     }
@@ -140,6 +153,40 @@ export default function Dashboard() {
                   {confirmDeleteId === blog.id ? 'Confirm Delete?' : 'Delete'}
                 </button>
               </div>
+            ))}
+          </div>
+        )}
+
+        <h2 className="dashboard-section-title">Contact Requests</h2>
+        {contactError && (
+          <p className="form-message error dashboard-inline-message" role="alert">
+            {contactError}
+          </p>
+        )}
+        {!contactError && contactRequests.length === 0 ? (
+          <div className="empty-state">
+            <span className="empty-icon"><BlogIcon /></span>
+            <h2>No contact requests yet</h2>
+            <p>Contact form submissions will appear here as they come in.</p>
+          </div>
+        ) : (
+          <div className="contact-requests-list">
+            {contactRequests.map((request) => (
+              <article key={request.id} className="contact-request-card">
+                <div className="contact-request-header">
+                  <h3>{request.name}</h3>
+                  <span className="blog-date">
+                    {new Date(request.created_at).toLocaleString()}
+                  </span>
+                </div>
+                <div className="contact-request-meta">
+                  <span><strong>Email:</strong> {request.email}</span>
+                  <span><strong>DOB:</strong> {request.dob}</span>
+                  <span><strong>Time:</strong> {request.tob}</span>
+                  <span><strong>Place:</strong> {request.pob}</span>
+                </div>
+                <p className="contact-request-issue">{request.issue}</p>
+              </article>
             ))}
           </div>
         )}

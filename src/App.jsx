@@ -6,6 +6,7 @@ import About from './pages/About'
 import Mission from './pages/Mission'
 import KundliGenerator from './pages/KundliGenerator'
 import ChartPlayground from './pages/ChartPlayground'
+import ContactForm from './pages/ContactForm'
 import Auth from './components/Auth'
 import Dashboard from './pages/Dashboard'
 import Blogs from './pages/Blogs'
@@ -60,6 +61,7 @@ function App() {
         <Route path="/mission" element={<Mission />} />
         <Route path="/kundli" element={<KundliGenerator />} />
         <Route path="/charts" element={<ChartPlayground />} />
+        <Route path="/contact" element={<ContactForm />} />
         <Route path="/blogs" element={<Blogs />} />
         <Route path="/blogs/:id" element={<BlogDetail />} />
         <Route path="/auth" element={<Auth />} />

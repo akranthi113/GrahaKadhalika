@@ -84,6 +84,13 @@ export default function Navbar() {
           >
             About
           </NavLink>
+          <NavLink
+            to="/contact"
+            onClick={closeMenu}
+            className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+          >
+            Contact Us
+          </NavLink>
           {user ? (
             <>
               <NavLink
