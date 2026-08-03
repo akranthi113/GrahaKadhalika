@@ -23,13 +23,19 @@ export default function Dashboard() {
   const [blogs, setBlogs] = useState([])
   const [contactRequests, setContactRequests] = useState([])
   const [contactError, setContactError] = useState('')
+  const [contactDeleteError, setContactDeleteError] = useState('')
   const [loading, setLoading] = useState(true)
   const [deleteError, setDeleteError] = useState('')
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
+  const [confirmContactId, setConfirmContactId] = useState(null)
   const confirmTimer = useRef(null)
+  const contactConfirmTimer = useRef(null)
 
   useEffect(() => {
-    return () => clearTimeout(confirmTimer.current)
+    return () => {
+      clearTimeout(confirmTimer.current)
+      clearTimeout(contactConfirmTimer.current)
+    }
   }, [])
 
   useEffect(() => {
@@ -106,6 +112,30 @@ export default function Dashboard() {
     setConfirmDeleteId(null)
   }
 
+  async function handleDeleteContact(id) {
+    setContactDeleteError('')
+
+    if (confirmContactId !== id) {
+      setConfirmContactId(id)
+      clearTimeout(contactConfirmTimer.current)
+      contactConfirmTimer.current = setTimeout(() => {
+        setConfirmContactId((current) => (current === id ? null : current))
+      }, 3000)
+      return
+    }
+
+    const { error } = await supabase.from('contact_requests').delete().eq('id', id)
+
+    if (error) {
+      setContactDeleteError('Failed to delete the contact request. Please try again.')
+      setConfirmContactId(null)
+      return
+    }
+
+    setContactRequests(contactRequests.filter((request) => request.id !== id))
+    setConfirmContactId(null)
+  }
+
   if (loading) {
     return (
       <div className="dashboard">
@@ -163,6 +193,11 @@ export default function Dashboard() {
             {contactError}
           </p>
         )}
+        {contactDeleteError && (
+          <p className="form-message error dashboard-inline-message" role="alert">
+            {contactDeleteError}
+          </p>
+        )}
         {!contactError && contactRequests.length === 0 ? (
           <div className="empty-state">
             <span className="empty-icon"><BlogIcon /></span>
@@ -170,24 +205,45 @@ export default function Dashboard() {
             <p>Contact form submissions will appear here as they come in.</p>
           </div>
         ) : (
-          <div className="contact-requests-list">
-            {contactRequests.map((request) => (
-              <article key={request.id} className="contact-request-card">
-                <div className="contact-request-header">
-                  <h3>{request.name}</h3>
-                  <span className="blog-date">
-                    {new Date(request.created_at).toLocaleString()}
-                  </span>
-                </div>
-                <div className="contact-request-meta">
-                  <span><strong>Email:</strong> {request.email}</span>
-                  <span><strong>DOB:</strong> {request.dob}</span>
-                  <span><strong>Time:</strong> {request.tob}</span>
-                  <span><strong>Place:</strong> {request.pob}</span>
-                </div>
-                <p className="contact-request-issue">{request.issue}</p>
-              </article>
-            ))}
+          <div className="table-scroll">
+            <table className="contact-requests-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Date of Birth</th>
+                  <th>Time</th>
+                  <th>Place</th>
+                  <th>Issue</th>
+                  <th>Submitted</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {contactRequests.map((request) => (
+                  <tr key={request.id}>
+                    <td data-label="Name">{request.name}</td>
+                    <td data-label="Email">{request.email}</td>
+                    <td data-label="Date of Birth">{request.dob}</td>
+                    <td data-label="Time">{request.tob}</td>
+                    <td data-label="Place">{request.pob}</td>
+                    <td data-label="Issue" className="table-cell-issue">{request.issue}</td>
+                    <td data-label="Submitted">
+                      {new Date(request.created_at).toLocaleString()}
+                    </td>
+                    <td data-label="Actions">
+                      <button
+                        onClick={() => handleDeleteContact(request.id)}
+                        className={confirmContactId === request.id ? 'delete-btn confirm' : 'delete-btn'}
+                        aria-label={`Delete contact request from ${request.name}`}
+                      >
+                        {confirmContactId === request.id ? 'Confirm Delete?' : 'Delete'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

@@ -4,7 +4,7 @@
 }
 
 .dashboard-container {
-  max-width: 800px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 0 1.5rem;
 }
@@ -136,52 +136,61 @@
   font-weight: 700;
 }
 
-.contact-requests-list {
-  display: grid;
-  gap: 1rem;
-}
-
-.contact-request-card {
-  background: var(--color-surface);
+.table-scroll {
+  overflow-x: auto;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-  padding: 1.5rem;
+  background: var(--color-surface);
 }
 
-.contact-request-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 0.5rem;
-}
-
-.contact-request-header h3 {
-  margin: 0;
-  color: var(--color-text);
-  font-size: 1.1rem;
-}
-
-.contact-request-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 1.5rem;
-  margin-bottom: 0.75rem;
+.contact-requests-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
   font-size: 0.875rem;
+}
+
+.contact-requests-table thead th {
+  text-align: left;
+  padding: 0.875rem 1rem;
+  background: var(--color-surface-alt, rgba(0, 0, 0, 0.04));
+  color: var(--color-text);
+  font-weight: 600;
+  border-bottom: 2px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.contact-requests-table tbody td {
+  padding: 0.875rem 1rem;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+  word-break: break-word;
+}
+
+.contact-requests-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.contact-requests-table tbody tr:hover {
+  background: var(--color-surface-alt, rgba(0, 0, 0, 0.02));
+}
+
+.contact-requests-table .table-cell-issue {
+  min-width: 220px;
+  max-width: 320px;
+  white-space: pre-wrap;
   color: var(--color-text-muted);
 }
 
-.contact-request-meta strong {
-  color: var(--color-text);
+.contact-requests-table td[data-label='Submitted'] {
+  white-space: nowrap;
 }
 
-.contact-request-issue {
-  color: var(--color-text);
-  font-size: 0.95rem;
-  line-height: 1.6;
-  border-top: 1px solid var(--color-border);
-  padding-top: 0.75rem;
-  white-space: pre-wrap;
+.contact-requests-table .delete-btn {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
 }
 
 @media (max-width: 640px) {
