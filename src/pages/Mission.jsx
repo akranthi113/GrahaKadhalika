@@ -5,7 +5,7 @@ export default function Mission() {
   useDocumentMeta({
     title: 'Our Mission - GrahaKadhalika',
     description:
-      'Our mission is to bring authentic, thoughtful Vedic astrology back — free, patient, and personal. Understand yourself and make better decisions through free will.',
+      'Our mission is to bring authentic Vedic astrology back — free, patient, and personal. Understand yourself and make better decisions through free will.',
   })
 
   return (

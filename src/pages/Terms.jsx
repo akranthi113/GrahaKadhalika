@@ -5,7 +5,7 @@ export default function Terms() {
   return (
     <LegalPage
       title="Terms of Use"
-      description="Terms governing your use of GrahaKadhalika, a free Vedic astrology consultation and kundli generation service."
+      description="Terms of use for GrahaKadhalika, a free Vedic astrology and kundli generation service, covering your rights and responsibilities on the site."
       lastUpdated="03 August 2026"
     >
       <p>

@@ -47,14 +47,22 @@ The `.env` file is gitignored and must be present on any machine that builds the
 
 This is a static SPA. Build with `npm run build` and host `dist/` anywhere (GitHub Pages, Netlify, Vercel, etc.).
 
-- Assets use relative paths (`base: './'`), so it works from a sub-path like GitHub Pages or a custom domain root.
-- Routing uses a hash router (`/#/kundli`, `/#/blogs`), so deep links work on any static host without server rewrites.
+- Assets use absolute paths (`base: '/'`), which requires serving from the domain root (works with a custom domain like `grahakadhalika.com`).
+- Routing uses React Router's `BrowserRouter` with real paths (`/kundli`, `/blogs`). For SEO, `npm run build` also prerenders every static route into `dist/<route>/index.html` so crawlers get real HTML at HTTP 200 instead of a client-side shell. The `404.html` SPA fallback is kept for unmatched paths.
 
 ### GitHub Pages
 
+The deploy script needs the `dist/` folder from a local `npm run build`, which automatically runs the prerender step:
+
 ```bash
-npm run deploy     # builds and publishes dist/ via gh-pages
+npm run build     # builds dist/ and prerenders each route to real HTML
+npm run deploy    # publishes dist/ via gh-pages
 ```
+
+Notes:
+- `.nojekyll` is included so GitHub Pages serves the built files without Jekyll processing.
+- Deep links (`/kundli`, `/about`, etc.) are served from their prerendered `index.html` at HTTP 200, which is required for Bing/Google to crawl them.
+- Configure the custom domain in your GitHub Pages settings; the sitemap and robots.txt reference `https://grahakadhalika.com/`.
 
 ## License
 

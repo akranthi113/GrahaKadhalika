@@ -89,7 +89,7 @@ export default function KundliGenerator() {
   useDocumentMeta({
     title: 'Free Kundli Generator - GrahaKadhalika',
     description:
-      'Generate your free Vedic kundli online. Enter birth details to calculate a sidereal Lahiri chart with South Indian layout, planet, house and vimsottari dasa analysis.',
+      'Generate your free Vedic kundli online. Enter birth details for a sidereal Lahiri chart with South Indian layout, planet, house and dasa analysis.',
   })
 
   const [formData, setFormData] = useState(INITIAL_FORM)

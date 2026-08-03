@@ -9,7 +9,7 @@ export default function Home() {
   useDocumentMeta({
     title: 'GrahaKadhalika - Free Vedic Astrology Consultation & Kundli Generator',
     description:
-      'GrahaKadhalika offers 100% free Vedic astrology consultation. Generate your sidereal Lahiri kundli, explore South Indian rasi charts, and get detailed planet, house and dasa analysis.',
+      '100% free Vedic astrology. Generate your sidereal Lahiri kundli, explore South Indian rasi charts, and get detailed planet, house and dasa analysis.',
   })
 
   const jsonLd = {

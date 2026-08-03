@@ -17,7 +17,7 @@ export default function Brand() {
   return (
     <LegalPage
       title="Brand Guidelines"
-      description="Usage rules for the GrahaKadhalika name, logo, colors, and typography."
+      description="Official brand guidelines for GrahaKadhalika — how to use the name, logo, colors, and typography for partners, press, and references."
     >
       <p>
         GrahaKadhalika is provided as a free public service. These guidelines explain how to use our
