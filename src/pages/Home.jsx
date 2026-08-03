@@ -72,10 +72,17 @@ export default function Home() {
             <button onClick={handleChatClick} className="landing-cta landing-cta-secondary">
               Chat Consultation
             </button>
+            <Link to="/contact" className="landing-cta landing-cta-secondary">
+              Contact Us
+            </Link>
           </div>
           {chatNote && (
             <p className="hero-chat-note" role="status">{chatNote}</p>
           )}
+          <p className="hero-availability-note">
+            If we are not available at the moment, share your details in the Contact Us form and we
+            will get back to you as soon as possible.
+          </p>
         </div>
       </section>
 
