@@ -89,19 +89,51 @@
 }
 
 .hero-chat-note {
+  margin: 1.25rem auto 0;
+  max-width: 520px;
+  padding: 0.875rem 1.25rem;
+  color: var(--color-text);
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid var(--color-primary);
+  border-left-width: 4px;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.hero-chat-note::before {
+  content: 'ℹ ';
+  font-weight: 700;
+}
+
+.hero-availability-note {
   margin-top: 1rem;
   color: var(--color-text-muted);
   font-size: 0.9rem;
   font-style: italic;
-}
-
-.hero-availability-note {
-  margin-top: 0.75rem;
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
-  max-width: 420px;
+  max-width: 460px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.hero-ctas-secondary {
+  margin-top: 1rem;
+}
+
+.landing-cta-tertiary {
+  padding: 0.75rem 1.75rem;
+  min-height: 44px;
+  font-size: 0.95rem;
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  box-shadow: none;
+}
+
+.landing-cta-tertiary:hover {
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--color-primary);
 }
 
 .landing-features {

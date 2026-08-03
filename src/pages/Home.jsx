@@ -33,9 +33,9 @@ export default function Home() {
 
   function handleChatClick() {
     setChatNote(
-      'Please click on the chat button at the right-hand corner below to start the conversation and ask. ' +
-        'We will respond to it, so please wait and keep your tab open so that anytime we respond you will get the message. ' +
-        'Just ask your questions.'
+      'You will see a small floating chat icon in the bottom-right corner of your screen. ' +
+        'Click that icon to open our live chat and start asking your questions. ' +
+        'Please keep this tab open so you receive our reply.'
     )
   }
 
@@ -72,9 +72,6 @@ export default function Home() {
             <button onClick={handleChatClick} className="landing-cta landing-cta-secondary">
               Chat Consultation
             </button>
-            <Link to="/contact" className="landing-cta landing-cta-secondary">
-              Contact Us
-            </Link>
           </div>
           {chatNote && (
             <p className="hero-chat-note" role="status">{chatNote}</p>
@@ -83,6 +80,11 @@ export default function Home() {
             If we are not available at the moment, share your details in the Contact Us form and we
             will get back to you as soon as possible.
           </p>
+          <div className="hero-ctas hero-ctas-secondary">
+            <Link to="/contact" className="landing-cta landing-cta-tertiary">
+              Contact Us
+            </Link>
+          </div>
         </div>
       </section>
 
