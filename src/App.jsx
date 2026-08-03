@@ -1,12 +1,17 @@
 import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import Navbar from './components/Navbar'
+import Footer from './components/Footer'
 import Home from './pages/Home'
 import About from './pages/About'
 import Mission from './pages/Mission'
 import KundliGenerator from './pages/KundliGenerator'
 import ChartPlayground from './pages/ChartPlayground'
 import ContactForm from './pages/ContactForm'
+import Privacy from './pages/Privacy'
+import Terms from './pages/Terms'
+import Accessibility from './pages/Accessibility'
+import Brand from './pages/Brand'
 import Auth from './components/Auth'
 import Dashboard from './pages/Dashboard'
 import Blogs from './pages/Blogs'
@@ -61,9 +66,13 @@ function App() {
         <Route path="/mission" element={<Mission />} />
         <Route path="/kundli" element={<KundliGenerator />} />
         <Route path="/charts" element={<ChartPlayground />} />
-        <Route path="/contact" element={<ContactForm />} />
+         <Route path="/contact" element={<ContactForm />} />
         <Route path="/blogs" element={<Blogs />} />
         <Route path="/blogs/:id" element={<BlogDetail />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/accessibility" element={<Accessibility />} />
+        <Route path="/brand" element={<Brand />} />
         <Route path="/auth" element={<Auth />} />
         <Route
           path="/dashboard"
@@ -75,6 +84,7 @@ function App() {
         />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Footer />
     </HashRouter>
   )
 }

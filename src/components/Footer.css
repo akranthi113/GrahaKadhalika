@@ -1,0 +1,85 @@
+.footer {
+  margin-top: auto;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  padding: 2.5rem 1.5rem 1.5rem;
+}
+
+.footer-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.footer-brand .footer-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-decoration: none;
+}
+
+.footer-tagline {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  margin-top: 0.35rem;
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.footer-group h4 {
+  color: var(--color-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.85rem;
+}
+
+.footer-group ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer-link {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.footer-link:hover,
+.footer-link:focus {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-top: 1px solid var(--color-border);
+  padding-top: 1rem;
+  color: var(--color-text-muted);
+  font-size: 0.825rem;
+}
+
+@media (max-width: 640px) {
+  .footer-nav {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+}
