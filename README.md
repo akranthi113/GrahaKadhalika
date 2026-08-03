@@ -49,6 +49,7 @@ This is a static SPA. Build with `npm run build` and host `dist/` anywhere (GitH
 
 - Assets use absolute paths (`base: '/'`), which requires serving from the domain root (works with a custom domain like `grahakadhalika.com`).
 - Routing uses React Router's `BrowserRouter` with real paths (`/kundli`, `/blogs`). For SEO, `npm run build` also prerenders every static route into `dist/<route>/index.html` so crawlers get real HTML at HTTP 200 instead of a client-side shell. The `404.html` SPA fallback is kept for unmatched paths.
+- Prerendering uses your local Chrome/Edge (auto-detected, or set `CHROME_PATH`). If no browser is found, the build still succeeds and simply skips the prerender step.
 
 ### GitHub Pages
 

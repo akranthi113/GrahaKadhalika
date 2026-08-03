@@ -19,11 +19,18 @@ const ROUTES = [
 
 const CHROME_CANDIDATES = [
   process.env.CHROME_PATH,
+  process.env.CHROME_BIN,
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
   `${process.env.LOCALAPPDATA || ''}/Google/Chrome/Application/chrome.exe`,
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
   'C:/Program Files/Microsoft/Edge/Application/msedge.exe',
+  '/usr/bin/google-chrome',
+  '/usr/bin/google-chrome-stable',
+  '/usr/bin/chromium',
+  '/usr/bin/chromium-browser',
+  '/usr/bin/microsoft-edge',
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
 ].filter(Boolean)
 
 const MIME = {
@@ -70,8 +77,11 @@ function startServer() {
 async function main() {
   const chromePath = CHROME_CANDIDATES.find((p) => p && existsSync(p))
   if (!chromePath) {
-    console.error('Prerender aborted: no Chrome/Edge found. Set CHROME_PATH to a browser executable.')
-    process.exit(1)
+    console.warn(
+      '[prerender] Skipped: no Chrome/Edge found. Routes will be client-rendered only.\n' +
+        '  To enable prerendering, install Chrome or set CHROME_PATH to a browser executable.'
+    )
+    return
   }
 
   const { server, baseUrl } = await startServer()
