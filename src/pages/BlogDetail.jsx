@@ -72,9 +72,9 @@ export default function BlogDetail() {
                   publisher: {
                     '@type': 'Organization',
                     name: 'GrahaKadhalika',
-                    url: 'https://akranthi113.github.io/GrahaKadhalika/',
+                    url: 'https://grahakadhalika.com/',
                   },
-                  mainEntityOfPage: `https://akranthi113.github.io/GrahaKadhalika/blogs/${blog.id}`,
+mainEntityOfPage: `https://grahakadhalika.com/blogs/${blog.id}`,
                 }),
               }}
             />

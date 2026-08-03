@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://akranthi113.github.io/GrahaKadhalika/sitemap.xml
+Sitemap: https://grahakadhalika.com/sitemap.xml

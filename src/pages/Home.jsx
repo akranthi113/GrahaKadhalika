@@ -18,14 +18,14 @@ export default function Home() {
       {
         '@type': 'WebSite',
         name: 'GrahaKadhalika',
-        url: 'https://akranthi113.github.io/GrahaKadhalika/',
+        url: 'https://grahakadhalika.com/',
         description:
           'Free Vedic astrology consultations with authentic kundli generation and detailed planet, house and dasa analysis.',
       },
       {
         '@type': 'Organization',
         name: 'GrahaKadhalika',
-        url: 'https://akranthi113.github.io/GrahaKadhalika/',
+        url: 'https://grahakadhalika.com/',
         slogan: '100% Free Astrology Consultation',
       },
     ],
