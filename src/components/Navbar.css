@@ -17,12 +17,21 @@
 }
 
 .navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 1.5rem;
   font-weight: 700;
   background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.navbar-logo {
+  width: 32px;
+  height: 34px;
+  object-fit: contain;
 }
 
 .navbar-links {

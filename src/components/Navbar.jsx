@@ -34,6 +34,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-brand" onClick={closeMenu}>
+          <img src="/logo.png" alt="GrahaKadhalika logo" className="navbar-logo" width="32" height="34" />
           GrahaKadhalika
         </Link>
         <button
