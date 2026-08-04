@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useDocumentMeta } from '../hooks/useDocumentMeta'
+import { usePWAInstall } from '../hooks/usePWAInstall'
 import './Home.css'
 
 export default function Home() {
   const [chatNote, setChatNote] = useState('')
+  const { isInstallable, install } = usePWAInstall()
 
   useDocumentMeta({
     title: 'GrahaKadhalika - Free Vedic Astrology Consultation & Kundli Generator',
@@ -72,6 +74,11 @@ export default function Home() {
             <button onClick={handleChatClick} className="landing-cta landing-cta-secondary">
               Chat Consultation
             </button>
+            {isInstallable && (
+              <button onClick={install} className="landing-cta landing-cta-secondary install-app-btn">
+                Install App
+              </button>
+            )}
           </div>
           {chatNote && (
             <p className="hero-chat-note" role="status">{chatNote}</p>

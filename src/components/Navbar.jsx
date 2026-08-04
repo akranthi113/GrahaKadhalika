@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { supabase } from '../utils/supabaseClient'
+import { usePWAInstall } from '../hooks/usePWAInstall'
 import './Navbar.css'
 
 export default function Navbar() {
   const [user, setUser] = useState(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
+  const { isInstallable, install } = usePWAInstall()
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -92,6 +94,11 @@ export default function Navbar() {
           >
             Contact Us
           </NavLink>
+          {isInstallable && (
+            <button type="button" className="install-app-btn" onClick={install}>
+              Install App
+            </button>
+          )}
           {user ? (
             <>
               <NavLink
