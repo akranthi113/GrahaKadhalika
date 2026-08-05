@@ -9,7 +9,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       manifest: false,
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,wasm,zip}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,wasm,zip,webmanifest}'],
         globIgnores: ['ephemeris/**', '**/ephemeris/*.se1', 'ephemeris/sat/**'],
         navigateFallback: '/index.html',
       },
